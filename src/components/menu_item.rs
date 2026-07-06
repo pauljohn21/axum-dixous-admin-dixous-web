@@ -68,13 +68,15 @@ fn has_active_child(node: &MenuTreeNode, current: &Route) -> bool {
     false
 }
 
-/// 获取菜单图标
+/// 获取菜单图标 — 将 Element Plus 图标类名映射为 emoji
 fn get_menu_icon(menu: &SysMenu) -> String {
+    // 优先使用后端返回的 icon 字段（映射为 emoji）
     if let Some(ref icon) = menu.icon {
         if !icon.is_empty() {
-            return icon.clone();
+            return map_icon_class_to_emoji(icon);
         }
     }
+    // 根据 path 兜底
     let path = menu.path.as_deref().unwrap_or("");
     match path.trim_start_matches('/') {
         "" | "dashboard" => "📊".to_string(),
@@ -85,6 +87,38 @@ fn get_menu_icon(menu: &SysMenu) -> String {
         "dictionary" | "dictionaries" => "📖".to_string(),
         _ => "📄".to_string(),
     }
+}
+
+/// 将 Element Plus 图标类名映射为 emoji
+fn map_icon_class_to_emoji(icon_class: &str) -> String {
+    match icon_class {
+        // 仪表盘/首页
+        "odometer" | "speedometer" | "dashboard" => "📊",
+        // 用户相关
+        "user" | "user-filled" => "👤",
+        "avatar" | "user-solid" | "peoples" => "👥",
+        // 角色/权限
+        "lock" | "key" => "🔐",
+        // 菜单
+        "tickets" | "menu" | "list" => "📋",
+        // API/接口
+        "platform" | "api" | "connection" => "🔌",
+        // 字典
+        "dict" | "dictionary" | "book" => "📖",
+        // 操作记录/历史
+        "operation" | "history" | "time" | "pie-chart" => "📜",
+        // 消息/通知
+        "message" | "bell" | "notification" => "💬",
+        // 工具
+        "tools" | "setting" | "settings" | "tool" => "🛠️",
+        // 系统配置
+        "system" | "monitor" | "cloudy" => "⚙️",
+        // 关于/信息
+        "info-filled" | "info" | "about" => "ℹ️",
+        // 默认
+        _ => "📄",
+    }
+    .to_string()
 }
 
 /// 菜单项组件 — 递归渲染菜单树

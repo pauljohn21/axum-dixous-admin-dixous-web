@@ -4,6 +4,7 @@ mod components;
 mod config;
 mod http;
 mod i18n;
+mod icons;
 mod models;
 mod router;
 mod storage;

@@ -1,6 +1,6 @@
 use web_sys::Storage;
 
-use crate::config::TOKEN_KEY;
+use crate::config::{TOKEN_KEY, USERNAME_KEY};
 
 /// 获取 localStorage 对象
 fn local_storage() -> Option<Storage> {
@@ -49,4 +49,21 @@ pub fn set_token(token: &str) {
 /// 清除 token
 pub fn clear_token() {
     remove(TOKEN_KEY);
+}
+
+// ===== Username 便捷方法 =====
+
+/// 获取当前用户名
+pub fn get_username() -> Option<String> {
+    get(USERNAME_KEY)
+}
+
+/// 设置用户名
+pub fn set_username(username: &str) {
+    set(USERNAME_KEY, username);
+}
+
+/// 清除用户名
+pub fn clear_username() {
+    remove(USERNAME_KEY);
 }

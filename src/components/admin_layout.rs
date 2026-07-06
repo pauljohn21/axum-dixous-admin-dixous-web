@@ -3,6 +3,7 @@ use dioxus_element_plug::prelude::*;
 
 use crate::api;
 use crate::components::menu_item::{MenuItem, MENU_CSS};
+use crate::components::user_dropdown::UserDropdown;
 use crate::i18n::{current_locale, set_locale, t, Locale, TKey};
 use crate::models::menu::{build_menu_tree, MenuTreeNode};
 use crate::router::Route;
@@ -137,16 +138,16 @@ pub fn AdminLayout() -> Element {
                             }
                         }
 
-                        span {
-                            style: "font-size: 14px; color: #606266;",
-                            "{username}"
-                        }
-
-                        Button {
-                            variant: ButtonVariant::Default,
-                            size: Some(ButtonSize::Small),
-                            on_click: do_logout,
-                            "{t(TKey::Logout)}"
+                        // 用户下拉菜单
+                        UserDropdown {
+                            username: username(),
+                            on_profile: move |_| {
+                                navigator.push(Route::Profile {});
+                            },
+                            on_settings: move |_| {
+                                navigator.push(Route::Settings {});
+                            },
+                            on_logout: do_logout,
                         }
                     }
                 }

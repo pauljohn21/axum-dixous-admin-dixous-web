@@ -5702,7 +5702,6 @@ version = "0.1.0"
 dependencies = [
  "dioxus",
  "dioxus-element-plug",
- "futures",
  "gloo-net 0.7.0",
  "serde",
  "serde_json",

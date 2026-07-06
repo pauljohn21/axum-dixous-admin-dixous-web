@@ -8,17 +8,17 @@ pub async fn list(
     keyword: Option<&str>,
 ) -> Result<PageResponse<SysApi>, String> {
     let query = build_page_query(page, page_size, keyword);
-    get_with_query("/api/api/list", &query).await
+    get_with_query("/api/apis/list", &query).await
 }
 
 pub async fn create(data: SysApiInsertDTO) -> Result<(), String> {
-    post("/api/api", &data).await
+    post("/api/apis", &data).await
 }
 
 pub async fn update(id: i32, data: SysApiUpdateDTO) -> Result<SysApi, String> {
-    put(&format!("/api/api/{}", id), &data).await
+    put(&format!("/api/apis/{}", id), &data).await
 }
 
 pub async fn delete_api(id: i32) -> Result<(), String> {
-    delete(&format!("/api/api/{}", id)).await
+    delete(&format!("/api/apis/{}", id)).await
 }

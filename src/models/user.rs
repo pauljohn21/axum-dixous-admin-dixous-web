@@ -1,4 +1,13 @@
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
+
+/// 自定义反序列化函数，将整数 0/1 转换为布尔值
+fn bool_from_int<'de, D>(deserializer: D) -> Result<Option<bool>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let value: Option<i32> = Option::deserialize(deserializer)?;
+    Ok(value.map(|v| v != 0))
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct SysUser {
@@ -15,7 +24,7 @@ pub struct SysUser {
     pub header_img: Option<String>,
     #[serde(default)]
     pub side_mode: Option<String>,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "bool_from_int")]
     pub enable: Option<bool>,
     #[serde(default)]
     pub created_at: Option<String>,

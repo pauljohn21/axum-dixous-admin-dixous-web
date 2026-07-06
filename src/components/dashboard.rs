@@ -8,7 +8,7 @@ use crate::i18n::{t, TKey};
 pub fn Dashboard() -> Element {
     rsx! {
         div {
-            style: "max-width: 1200px;",
+            style: "width: 100%;",
 
             // 欢迎卡片
                         Card {

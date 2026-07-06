@@ -27,9 +27,10 @@ pub fn Login() -> Element {
         error_msg.set(None);
 
         spawn(async move {
-            match api::auth::login(username_val, password_val).await {
+            match api::auth::login(username_val.clone(), password_val).await {
                 Ok(resp) => {
                     storage::set_token(&resp.token);
+                    storage::set_username(&username_val);
                     navigator.replace(Route::Dashboard {});
                 }
                 Err(e) => {

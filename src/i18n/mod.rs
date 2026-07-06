@@ -99,6 +99,8 @@ pub enum TKey {
     // 字典管理
     DictManage, AddDict, EditDict, DictName, DictCode, DictDesc,
     SearchDictPlaceholder, DictNamePlaceholder, DictCodePlaceholder, DictDescPlaceholder, DescPlaceholder, Description,
+    // 个人信息和设置
+    Profile, Settings, BasicInfo, Avatar, Guest, SystemSettings, Language, Theme, ComingSoon,
 }
 
 /// 翻译函数（响应式 — 渲染期调用会订阅 locale Signal）
@@ -157,6 +159,10 @@ fn t_zh(key: TKey) -> String {
         TKey::SearchDictPlaceholder => "搜索字典名称/编码", TKey::DictNamePlaceholder => "请输入字典名称",
         TKey::DictCodePlaceholder => "请输入字典编码", TKey::DictDescPlaceholder => "请输入描述", TKey::DescPlaceholder => "请输入描述",
         TKey::Description => "描述",
+        // 个人信息和设置
+        TKey::Profile => "个人信息", TKey::Settings => "系统配置", TKey::BasicInfo => "基本信息",
+        TKey::Avatar => "头像", TKey::Guest => "访客", TKey::SystemSettings => "系统设置",
+        TKey::Language => "语言", TKey::Theme => "主题", TKey::ComingSoon => "即将推出",
     }.into()
 }
 
@@ -200,5 +206,9 @@ fn t_en(key: TKey) -> String {
         TKey::SearchDictPlaceholder => "Search dictionary name/code", TKey::DictNamePlaceholder => "Enter dictionary name",
         TKey::DictCodePlaceholder => "Enter dictionary code", TKey::DictDescPlaceholder => "Enter description", TKey::DescPlaceholder => "Enter description",
         TKey::Description => "Description",
+        // 个人信息和设置
+        TKey::Profile => "Profile", TKey::Settings => "Settings", TKey::BasicInfo => "Basic Info",
+        TKey::Avatar => "Avatar", TKey::Guest => "Guest", TKey::SystemSettings => "System Settings",
+        TKey::Language => "Language", TKey::Theme => "Theme", TKey::ComingSoon => "Coming Soon",
     }.into()
 }

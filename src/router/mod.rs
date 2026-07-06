@@ -8,7 +8,9 @@ use crate::components::dashboard::Dashboard;
 use crate::components::dict_manage::DictManage;
 use crate::components::login::Login;
 use crate::components::menu_manage::MenuManage;
+use crate::components::profile::Profile;
 use crate::components::role_manage::RoleManage;
+use crate::components::settings::Settings;
 use crate::components::user_manage::UserManage;
 use crate::i18n::{t, TKey};
 
@@ -32,6 +34,10 @@ pub enum Route {
         ApiManage {},
         #[route("/dictionaries")]
         DictManage {},
+        #[route("/profile")]
+        Profile {},
+        #[route("/settings")]
+        Settings {},
     #[end_layout]
 
     #[route("/:..route")]

@@ -5,15 +5,16 @@ use crate::models::menu::{MenuTreeNode, SysMenu};
 use crate::router::Route;
 
 /// 将菜单 path 映射到 Route 枚举
+/// 注意：后端菜单 path 使用单数形式（user, role, menu, api, dictionary）
 fn menu_path_to_route(path: &str) -> Option<Route> {
     let path = path.trim_start_matches('/');
     match path {
         "" | "dashboard" => Some(Route::Dashboard {}),
-        "users" => Some(Route::UserManage {}),
-        "roles" => Some(Route::RoleManage {}),
-        "menus" => Some(Route::MenuManage {}),
-        "apis" => Some(Route::ApiManage {}),
-        "dictionaries" => Some(Route::DictManage {}),
+        "user" | "users" => Some(Route::UserManage {}),
+        "role" | "roles" => Some(Route::RoleManage {}),
+        "menu" | "menus" => Some(Route::MenuManage {}),
+        "api" | "apis" => Some(Route::ApiManage {}),
+        "dictionary" | "dictionaries" => Some(Route::DictManage {}),
         _ => None,
     }
 }
@@ -28,11 +29,11 @@ fn get_menu_icon(menu: &SysMenu) -> String {
     let path = menu.path.as_deref().unwrap_or("");
     match path.trim_start_matches('/') {
         "" | "dashboard" => "📊".to_string(),
-        "users" => "👤".to_string(),
-        "roles" => "👥".to_string(),
-        "menus" => "📋".to_string(),
-        "apis" => "🔌".to_string(),
-        "dictionaries" => "📖".to_string(),
+        "user" | "users" => "👤".to_string(),
+        "role" | "roles" => "👥".to_string(),
+        "menu" | "menus" => "📋".to_string(),
+        "api" | "apis" => "🔌".to_string(),
+        "dictionary" | "dictionaries" => "📖".to_string(),
         _ => "📄".to_string(),
     }
 }

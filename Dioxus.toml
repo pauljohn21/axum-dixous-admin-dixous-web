@@ -3,7 +3,7 @@
 [web.app]
 
 # HTML title tag content
-title = "web"
+title = "Axum Admin"
 
 # include `assets` in web platform
 [web.resource]

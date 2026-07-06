@@ -2,6 +2,7 @@ use dioxus::prelude::*;
 use dioxus_element_plug::prelude::*;
 
 use crate::api;
+use crate::i18n::{t, t_paging, TKey};
 use crate::models::role::{SysRole, SysRoleInsertDTO, SysRoleUpdateDTO};
 
 /// 角色管理页面
@@ -105,11 +106,11 @@ pub fn RoleManage() -> Element {
         div {
             div {
                 style: "display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;",
-                h2 { style: "font-size: 20px; font-weight: 600; color: #303030; margin: 0;", "角色管理" }
+                h2 { style: "font-size: 20px; font-weight: 600; color: #303030; margin: 0;", "{t(TKey::RoleManage)}" }
                 Button {
                     variant: ButtonVariant::Primary,
                     on_click: on_add,
-                    "+ 新增角色"
+                    "{t(TKey::AddRole)}"
                 }
             }
 
@@ -126,14 +127,14 @@ pub fn RoleManage() -> Element {
                     style: "flex: 1; max-width: 300px;",
                     Input {
                         value: Some(keyword()),
-                        placeholder: Some("搜索角色名称".to_string()),
+                        placeholder: Some(t(TKey::SearchRolePlaceholder)),
                         on_change: move |e: Event<FormData>| { keyword.set(e.data().value()); }
                     }
                 }
                 Button {
                     variant: ButtonVariant::Primary,
                     on_click: move |_| { current_page.set(1); fetch_roles(); },
-                    "搜索"
+                    "{t(TKey::Search)}"
                 }
             }
 
@@ -144,17 +145,17 @@ pub fn RoleManage() -> Element {
                     thead {
                         tr {
                             th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "ID" }
-                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "角色名称" }
-                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "关键词" }
-                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "描述" }
-                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "操作" }
+                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "{t(TKey::RoleName)}" }
+                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "{t(TKey::RoleKeyword)}" }
+                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "{t(TKey::RoleDesc)}" }
+                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "{t(TKey::Action)}" }
                         }
                     }
                     tbody {
                         if loading() {
-                            tr { td { colspan: "5", style: "text-align: center; padding: 40px; color: #909399;", "加载中..." } }
+                            tr { td { colspan: "5", style: "text-align: center; padding: 40px; color: #909399;", "{t(TKey::Loading)}" } }
                         } else if roles().is_empty() {
-                            tr { td { colspan: "5", style: "text-align: center; padding: 40px; color: #909399;", "暂无数据" } }
+                            tr { td { colspan: "5", style: "text-align: center; padding: 40px; color: #909399;", "{t(TKey::NoData)}" } }
                         } else {
                             for role in roles() {
                                 tr {
@@ -171,13 +172,13 @@ pub fn RoleManage() -> Element {
                                                 variant: ButtonVariant::Primary,
                                                 size: Some(ButtonSize::Small),
                                                 on_click: move |_| on_delete(role.id),
-                                                "编辑"
+                                                "{t(TKey::Edit)}"
                                             }
                                             Button {
                                                 variant: ButtonVariant::Danger,
                                                 size: Some(ButtonSize::Small),
                                                 on_click: move |_| on_edit(role.clone()),
-                                                "删除"
+                                                "{t(TKey::Delete)}"
                                             }
                                         }
                                     }
@@ -189,7 +190,7 @@ pub fn RoleManage() -> Element {
 
                 div {
                     style: "display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-top: 1px solid #ebeef5;",
-                    span { style: "font-size: 14px; color: #909399;", "共 {total()} 条记录，第 {current_page}/{total_pages} 页" }
+                    span { style: "font-size: 14px; color: #909399;", "{t_paging(total(), current_page(), total_pages)}" }
                     div {
                         style: "display: flex; gap: 8px;",
                         Button {
@@ -197,14 +198,14 @@ pub fn RoleManage() -> Element {
                             size: Some(ButtonSize::Small),
                             disabled: current_page() <= 1,
                             on_click: move |_| { current_page.set(current_page() - 1); fetch_roles(); },
-                            "上一页"
+                            "{t(TKey::PrevPage)}"
                         }
                         Button {
                             variant: ButtonVariant::Default,
                             size: Some(ButtonSize::Small),
                             disabled: current_page() >= total_pages as u32,
                             on_click: move |_| { current_page.set(current_page() + 1); fetch_roles(); },
-                            "下一页"
+                            "{t(TKey::NextPage)}"
                         }
                     }
                 }
@@ -220,40 +221,40 @@ pub fn RoleManage() -> Element {
                         style: "background: white; border-radius: 8px; padding: 24px; width: 480px;",
                         onclick: move |e: MouseEvent| { e.stop_propagation(); },
 
-                        h3 { style: "font-size: 18px; font-weight: 600; color: #303030; margin: 0 0 24px 0;", if is_edit() { "编辑角色" } else { "新增角色" } }
+                        h3 { style: "font-size: 18px; font-weight: 600; color: #303030; margin: 0 0 24px 0;", if is_edit() { "{t(TKey::EditRole)}" } else { "{t(TKey::AddRole)}" } }
 
                         div {
                             style: "margin-bottom: 16px;",
-                            label { style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;", "角色名称 *" }
+                            label { style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;", "{t(TKey::RoleName)} *" }
                             Input {
                                 value: Some(form_name()),
-                                placeholder: Some("请输入角色名称".to_string()),
+                                placeholder: Some(t(TKey::RoleNamePlaceholder)),
                                 on_change: move |e: Event<FormData>| { form_name.set(e.data().value()); }
                             }
                         }
                         div {
                             style: "margin-bottom: 16px;",
-                            label { style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;", "关键词" }
+                            label { style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;", "{t(TKey::RoleKeyword)}" }
                             Input {
                                 value: Some(form_keyword()),
-                                placeholder: Some("请输入角色关键词".to_string()),
+                                placeholder: Some(t(TKey::RoleKeywordPlaceholder)),
                                 on_change: move |e: Event<FormData>| { form_keyword.set(e.data().value()); }
                             }
                         }
                         div {
                             style: "margin-bottom: 24px;",
-                            label { style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;", "描述" }
+                            label { style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;", "{t(TKey::RoleDesc)}" }
                             Input {
                                 value: Some(form_desc()),
-                                placeholder: Some("请输入角色描述".to_string()),
+                                placeholder: Some(t(TKey::RoleDescPlaceholder)),
                                 on_change: move |e: Event<FormData>| { form_desc.set(e.data().value()); }
                             }
                         }
 
                         div {
                             style: "display: flex; justify-content: flex-end; gap: 12px;",
-                            Button { variant: ButtonVariant::Default, on_click: move |_| { dialog_visible.set(false); }, "取消" }
-                            Button { variant: ButtonVariant::Primary, on_click: on_submit, "确定" }
+                            Button { variant: ButtonVariant::Default, on_click: move |_| { dialog_visible.set(false); }, "{t(TKey::Cancel)}" }
+                            Button { variant: ButtonVariant::Primary, on_click: on_submit, "{t(TKey::Confirm)}" }
                         }
                     }
                 }

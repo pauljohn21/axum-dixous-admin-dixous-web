@@ -3,6 +3,7 @@ use dioxus_element_plug::prelude::*;
 
 use crate::api;
 use crate::components::menu_item::MenuItem;
+use crate::i18n::{current_locale, set_locale, t, Locale, TKey};
 use crate::models::menu::{build_menu_tree, MenuTreeNode};
 use crate::router::Route;
 use crate::storage;
@@ -117,6 +118,22 @@ pub fn AdminLayout() -> Element {
                     div {
                         style: "display: flex; align-items: center; gap: 16px;",
 
+                        // 语言切换
+                        div {
+                            style: "display: flex; align-items: center; gap: 4px;",
+                            button {
+                                style: "padding: 4px 8px; font-size: 12px; border: 1px solid #dcdfe6; border-radius: 4px; cursor: pointer; background: transparent; color: #606266;",
+                                onclick: move |_| {
+                                    let cur = current_locale();
+                                    set_locale(match cur {
+                                        Locale::ZhCN => Locale::EnUS,
+                                        Locale::EnUS => Locale::ZhCN,
+                                    });
+                                },
+                                "{current_locale().label()}"
+                            }
+                        }
+
                         span {
                             style: "font-size: 14px; color: #606266;",
                             "{username}"
@@ -126,7 +143,7 @@ pub fn AdminLayout() -> Element {
                             variant: ButtonVariant::Default,
                             size: Some(ButtonSize::Small),
                             on_click: do_logout,
-                            "退出登录"
+                            "{t(TKey::Logout)}"
                         }
                     }
                 }

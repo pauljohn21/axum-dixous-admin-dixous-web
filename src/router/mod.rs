@@ -10,6 +10,7 @@ use crate::components::login::Login;
 use crate::components::menu_manage::MenuManage;
 use crate::components::role_manage::RoleManage;
 use crate::components::user_manage::UserManage;
+use crate::i18n::{t, TKey};
 
 /// 路由枚举
 #[derive(Debug, Clone, Routable, PartialEq)]
@@ -49,13 +50,13 @@ fn NotFound(route: Vec<String>) -> Element {
             }
             p {
                 style: "font-size: 18px; color: #909399; margin: 0 0 24px 0;",
-                "页面未找到: /{route.join(\"/\")}"
+                "{t(TKey::PageNotFound)}: /{route.join(\"/\")}"
             }
             Link {
                 to: Route::Dashboard {},
                 Button {
                     variant: ButtonVariant::Primary,
-                    "返回首页"
+                    "{t(TKey::BackHome)}"
                 }
             }
         }

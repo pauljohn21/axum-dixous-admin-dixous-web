@@ -1,6 +1,7 @@
 use dioxus::prelude::*;
 use dioxus_element_plug::prelude::*;
 
+use crate::i18n::provide_locale;
 use crate::router::Route;
 
 const FAVICON: Asset = asset!("/assets/favicon.ico");
@@ -9,6 +10,7 @@ const FAVICON: Asset = asset!("/assets/favicon.ico");
 #[component]
 pub fn App() -> Element {
     let styles = CompleteStyleManager::new().generate_complete_styles();
+    provide_locale();
 
     rsx! {
         document::Link { rel: "icon", href: FAVICON }

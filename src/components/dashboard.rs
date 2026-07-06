@@ -1,6 +1,8 @@
 use dioxus::prelude::*;
 use dioxus_element_plug::prelude::*;
 
+use crate::i18n::{t, TKey};
+
 /// 仪表盘页面
 #[component]
 pub fn Dashboard() -> Element {
@@ -9,20 +11,21 @@ pub fn Dashboard() -> Element {
             style: "max-width: 1200px;",
 
             // 欢迎卡片
-            Card {
+                        Card {
                 class: "mb-6",
-                header: Some("欢迎".to_string()),
+                header: Some(t(TKey::Welcome)),
                 
+
 
                 div {
                     style: "padding: 20px 0;",
                     h2 {
                         style: "font-size: 24px; color: #303030; margin: 0 0 8px 0;",
-                        "欢迎使用 Axum Admin 管理系统"
+                        "{t(TKey::WelcomeMessage)}"
                     }
                     p {
                         style: "font-size: 14px; color: #909399; margin: 0;",
-                        "基于 Axum + Dioxus + Element Plus 构建的后台管理系统"
+                        "{t(TKey::WelcomeDescription)}"
                     }
                 }
             }
@@ -37,7 +40,7 @@ pub fn Dashboard() -> Element {
                     div {
                         style: "display: flex; align-items: center; justify-content: space-between;",
                         div {
-                            p { style: "font-size: 14px; color: #909399; margin: 0 0 8px 0;", "用户总数" }
+                            p { style: "font-size: 14px; color: #909399; margin: 0 0 8px 0;", "{t(TKey::TotalUsers)}" }
                             p { style: "font-size: 28px; font-weight: 700; color: #409eff; margin: 0;", "128" }
                         }
                         div {
@@ -53,7 +56,7 @@ pub fn Dashboard() -> Element {
                     div {
                         style: "display: flex; align-items: center; justify-content: space-between;",
                         div {
-                            p { style: "font-size: 14px; color: #909399; margin: 0 0 8px 0;", "角色总数" }
+                            p { style: "font-size: 14px; color: #909399; margin: 0 0 8px 0;", "{t(TKey::TotalRoles)}" }
                             p { style: "font-size: 28px; font-weight: 700; color: #67c23a; margin: 0;", "8" }
                         }
                         div {
@@ -69,7 +72,7 @@ pub fn Dashboard() -> Element {
                     div {
                         style: "display: flex; align-items: center; justify-content: space-between;",
                         div {
-                            p { style: "font-size: 14px; color: #909399; margin: 0 0 8px 0;", "菜单总数" }
+                            p { style: "font-size: 14px; color: #909399; margin: 0 0 8px 0;", "{t(TKey::TotalMenus)}" }
                             p { style: "font-size: 28px; font-weight: 700; color: #e6a23c; margin: 0;", "32" }
                         }
                         div {
@@ -85,7 +88,7 @@ pub fn Dashboard() -> Element {
                     div {
                         style: "display: flex; align-items: center; justify-content: space-between;",
                         div {
-                            p { style: "font-size: 14px; color: #909399; margin: 0 0 8px 0;", "API总数" }
+                            p { style: "font-size: 14px; color: #909399; margin: 0 0 8px 0;", "{t(TKey::TotalApis)}" }
                             p { style: "font-size: 28px; font-weight: 700; color: #f56c6c; margin: 0;", "56" }
                         }
                         div {
@@ -97,41 +100,42 @@ pub fn Dashboard() -> Element {
             }
 
             // 系统信息
-            Card {
-                header: Some("系统信息".to_string()),
+                        Card {
+                header: Some(t(TKey::SystemInfo)),
                 
+
 
                 div {
                     style: "padding: 12px 0;",
 
                     div {
                         style: "display: flex; padding: 12px 0; border-bottom: 1px solid #ebeef5;",
-                        span { style: "width: 160px; color: #909399; font-size: 14px;", "后端框架" }
+                        span { style: "width: 160px; color: #909399; font-size: 14px;", "{t(TKey::BackendFramework)}" }
                         span { style: "color: #303030; font-size: 14px;", "Axum 0.8 (Rust)" }
                     }
                     div {
                         style: "display: flex; padding: 12px 0; border-bottom: 1px solid #ebeef5;",
-                        span { style: "width: 160px; color: #909399; font-size: 14px;", "前端框架" }
+                        span { style: "width: 160px; color: #909399; font-size: 14px;", "{t(TKey::FrontendFramework)}" }
                         span { style: "color: #303030; font-size: 14px;", "Dioxus 0.7 (Rust/WASM)" }
                     }
                     div {
                         style: "display: flex; padding: 12px 0; border-bottom: 1px solid #ebeef5;",
-                        span { style: "width: 160px; color: #909399; font-size: 14px;", "UI组件库" }
+                        span { style: "width: 160px; color: #909399; font-size: 14px;", "{t(TKey::UiLibrary)}" }
                         span { style: "color: #303030; font-size: 14px;", "Element Plus (dioxus-element-plug)" }
                     }
                     div {
                         style: "display: flex; padding: 12px 0; border-bottom: 1px solid #ebeef5;",
-                        span { style: "width: 160px; color: #909399; font-size: 14px;", "数据库" }
+                        span { style: "width: 160px; color: #909399; font-size: 14px;", "{t(TKey::Database)}" }
                         span { style: "color: #303030; font-size: 14px;", "MySQL (SeaORM)" }
                     }
                     div {
                         style: "display: flex; padding: 12px 0; border-bottom: 1px solid #ebeef5;",
-                        span { style: "width: 160px; color: #909399; font-size: 14px;", "权限框架" }
+                        span { style: "width: 160px; color: #909399; font-size: 14px;", "{t(TKey::AuthFramework)}" }
                         span { style: "color: #303030; font-size: 14px;", "Casbin RBAC" }
                     }
                     div {
                         style: "display: flex; padding: 12px 0;",
-                        span { style: "width: 160px; color: #909399; font-size: 14px;", "API文档" }
+                        span { style: "width: 160px; color: #909399; font-size: 14px;", "{t(TKey::ApiDocs)}" }
                         a {
                             href: "http://localhost:8888",
                             target: "_blank",

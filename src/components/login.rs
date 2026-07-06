@@ -2,6 +2,7 @@ use dioxus::prelude::*;
 use dioxus_element_plug::prelude::*;
 
 use crate::api;
+use crate::i18n::{current_locale, set_locale, t, Locale, TKey};
 use crate::router::Route;
 use crate::storage;
 
@@ -18,7 +19,7 @@ pub fn Login() -> Element {
         let username_val = username();
         let password_val = password();
         if username_val.is_empty() || password_val.is_empty() {
-            error_msg.set(Some("用户名和密码不能为空".to_string()));
+            error_msg.set(Some(t(TKey::UsernamePasswordRequired)));
             return;
         }
 
@@ -56,7 +57,7 @@ pub fn Login() -> Element {
                     }
                     p {
                         style: "font-size: 14px; color: #909399; margin: 0;",
-                        "后台管理系统"
+                        "{t(TKey::AdminSystem)}"
                     }
                 }
 
@@ -68,16 +69,16 @@ pub fn Login() -> Element {
                     }
                 }
 
-                // 用户名输入
-                div {
-                    style: "margin-bottom: 20px;",
-                    label {
-                        style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;",
-                        "用户名"
-                    }
-                    Input {
-                        value: Some(username()),
-                        placeholder: Some("请输入用户名".to_string()),
+                    // 用户名输入
+                    div {
+                        style: "margin-bottom: 20px;",
+                        label {
+                            style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;",
+                            "{t(TKey::Username)}"
+                        }
+                        Input {
+                            value: Some(username()),
+                            placeholder: Some(t(TKey::UsernamePlaceholder)),
                         size: InputSize::Large,
                         on_change: move |e: Event<FormData>| {
                             username.set(e.data().value());
@@ -85,17 +86,17 @@ pub fn Login() -> Element {
                     }
                 }
 
-                // 密码输入
-                div {
-                    style: "margin-bottom: 24px;",
-                    label {
-                        style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;",
-                        "密码"
-                    }
-                    Input {
-                        value: Some(password()),
-                        input_type: InputType::Password,
-                        placeholder: Some("请输入密码".to_string()),
+                    // 密码输入
+                    div {
+                        style: "margin-bottom: 24px;",
+                        label {
+                            style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;",
+                            "{t(TKey::Password)}"
+                        }
+                        Input {
+                            value: Some(password()),
+                            input_type: InputType::Password,
+                            placeholder: Some(t(TKey::PasswordPlaceholder)),
                         size: InputSize::Large,
                         on_change: move |e: Event<FormData>| {
                             password.set(e.data().value());
@@ -110,13 +111,24 @@ pub fn Login() -> Element {
                     disabled: loading(),
                     style: Some("width: 100%;".to_string()),
                     on_click: do_login,
-                    if loading() { "登录中..." } else { "登 录" }
+                    if loading() { "{t(TKey::LoggingIn)}" } else { "{t(TKey::Login)}" }
                 }
 
-                // 底部信息
+                // 底部信息 + 语言切换
                 div {
-                    style: "text-align: center; margin-top: 24px; font-size: 12px; color: #c0c4cc;",
+                    style: "text-align: center; margin-top: 24px; font-size: 12px; color: #c0c4cc; display: flex; flex-direction: column; align-items: center; gap: 12px;",
                     "Powered by Axum + Dioxus"
+                    button {
+                        style: "padding: 4px 12px; font-size: 12px; border: 1px solid #dcdfe6; border-radius: 4px; cursor: pointer; background: transparent; color: #909399;",
+                        onclick: move |_| {
+                            let cur = current_locale();
+                            set_locale(match cur {
+                                Locale::ZhCN => Locale::EnUS,
+                                Locale::EnUS => Locale::ZhCN,
+                            });
+                        },
+                        "{current_locale().label()}"
+                    }
                 }
             }
         }

@@ -2,6 +2,7 @@ use dioxus::prelude::*;
 use dioxus_element_plug::prelude::*;
 
 use crate::api;
+use crate::i18n::{t, t_paging, TKey};
 use crate::models::sys_api::{SysApi, SysApiInsertDTO, SysApiUpdateDTO};
 
 fn method_color(method: &str) -> String {
@@ -133,7 +134,7 @@ pub fn ApiManage() -> Element {
         div {
             div {
                 style: "display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;",
-                h2 { style: "font-size: 20px; font-weight: 600; color: #303030; margin: 0;", "API管理" }
+                h2 { style: "font-size: 20px; font-weight: 600; color: #303030; margin: 0;", "{t(TKey::ApiManage)}" }
                 Button { variant: ButtonVariant::Primary, on_click: move |_| {
                     is_edit.set(false);
                     form_path.set(String::new());
@@ -141,7 +142,7 @@ pub fn ApiManage() -> Element {
                     form_group.set(String::new());
                     form_description.set(String::new());
                     dialog_visible.set(true);
-                }, "+ 新增API" }
+                }, "{t(TKey::AddApi)}" }
             }
 
             if let Some(msg) = error_msg() {
@@ -154,11 +155,11 @@ pub fn ApiManage() -> Element {
                     style: "flex: 1; max-width: 300px;",
                     Input {
                         value: Some(keyword()),
-                        placeholder: Some("搜索API路径/描述".to_string()),
+                        placeholder: Some(t(TKey::SearchApiPlaceholder)),
                         on_change: move |e: Event<FormData>| { keyword.set(e.data().value()); }
                     }
                 }
-                Button { variant: ButtonVariant::Primary, on_click: move |_| { current_page.set(1); fetch_apis(); }, "搜索" }
+                Button { variant: ButtonVariant::Primary, on_click: move |_| { current_page.set(1); fetch_apis(); }, "{t(TKey::Search)}" }
             }
 
             div {
@@ -168,18 +169,18 @@ pub fn ApiManage() -> Element {
                     thead {
                         tr {
                             th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "ID" }
-                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "路径" }
-                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "方法" }
-                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "分组" }
-                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "描述" }
-                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "操作" }
+                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "{t(TKey::ApiPath)}" }
+                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "{t(TKey::ApiMethod)}" }
+                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "{t(TKey::ApiGroup)}" }
+                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "{t(TKey::ApiDescription)}" }
+                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "{t(TKey::Action)}" }
                         }
                     }
                     tbody {
                         if loading() {
-                            tr { td { colspan: "6", style: "text-align: center; padding: 40px; color: #909399;", "加载中..." } }
+                            tr { td { colspan: "6", style: "text-align: center; padding: 40px; color: #909399;", "{t(TKey::Loading)}" } }
                         } else if rows.is_empty() {
-                            tr { td { colspan: "6", style: "text-align: center; padding: 40px; color: #909399;", "暂无数据" } }
+                            tr { td { colspan: "6", style: "text-align: center; padding: 40px; color: #909399;", "{t(TKey::NoData)}" } }
                         } else {
                             for row in rows {
                                 tr {
@@ -203,13 +204,13 @@ pub fn ApiManage() -> Element {
                                                 variant: ButtonVariant::Primary,
                                                 size: Some(ButtonSize::Small),
                                                 on_click: move |_| on_edit(row.original.clone()),
-                                                "编辑"
+                                                "{t(TKey::Edit)}"
                                             }
                                             Button {
                                                 variant: ButtonVariant::Danger,
                                                 size: Some(ButtonSize::Small),
                                                 on_click: move |_| on_delete(row.id),
-                                                "删除"
+                                                "{t(TKey::Delete)}"
                                             }
                                         }
                                     }
@@ -221,11 +222,11 @@ pub fn ApiManage() -> Element {
 
                 div {
                     style: "display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-top: 1px solid #ebeef5;",
-                    span { style: "font-size: 14px; color: #909399;", "共 {total()} 条记录，第 {current_page}/{total_pages} 页" }
+                    span { style: "font-size: 14px; color: #909399;", "{t_paging(total(), current_page(), total_pages)}" }
                     div {
                         style: "display: flex; gap: 8px;",
-                        Button { variant: ButtonVariant::Default, size: Some(ButtonSize::Small), disabled: current_page() <= 1, on_click: move |_| { current_page.set(current_page() - 1); fetch_apis(); }, "上一页" }
-                        Button { variant: ButtonVariant::Default, size: Some(ButtonSize::Small), disabled: current_page() >= total_pages as u32, on_click: move |_| { current_page.set(current_page() + 1); fetch_apis(); }, "下一页" }
+                        Button { variant: ButtonVariant::Default, size: Some(ButtonSize::Small), disabled: current_page() <= 1, on_click: move |_| { current_page.set(current_page() - 1); fetch_apis(); }, "{t(TKey::PrevPage)}" }
+                        Button { variant: ButtonVariant::Default, size: Some(ButtonSize::Small), disabled: current_page() >= total_pages as u32, on_click: move |_| { current_page.set(current_page() + 1); fetch_apis(); }, "{t(TKey::NextPage)}" }
                     }
                 }
             }
@@ -237,31 +238,31 @@ pub fn ApiManage() -> Element {
                     div {
                         style: "background: white; border-radius: 8px; padding: 24px; width: 480px;",
                         onclick: move |e: MouseEvent| { e.stop_propagation(); },
-                        h3 { style: "font-size: 18px; font-weight: 600; color: #303030; margin: 0 0 24px 0;", if is_edit() { "编辑API" } else { "新增API" } }
+                        h3 { style: "font-size: 18px; font-weight: 600; color: #303030; margin: 0 0 24px 0;", if is_edit() { "{t(TKey::EditApi)}" } else { "{t(TKey::AddApi)}" } }
                         div {
                             style: "margin-bottom: 16px;",
-                            label { style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;", "路径 *" }
-                            Input { value: Some(form_path()), placeholder: Some("如 /api/user/list".to_string()), on_change: move |e: Event<FormData>| { form_path.set(e.data().value()); } }
+                            label { style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;", "{t(TKey::ApiPath)} *" }
+                            Input { value: Some(form_path()), placeholder: Some(t(TKey::ApiPathPlaceholder)), on_change: move |e: Event<FormData>| { form_path.set(e.data().value()); } }
                         }
                         div {
                             style: "margin-bottom: 16px;",
-                            label { style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;", "方法 *" }
-                            Input { value: Some(form_method()), placeholder: Some("GET/POST/PUT/DELETE".to_string()), on_change: move |e: Event<FormData>| { form_method.set(e.data().value()); } }
+                            label { style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;", "{t(TKey::ApiMethod)} *" }
+                            Input { value: Some(form_method()), placeholder: Some(t(TKey::ApiMethodPlaceholder)), on_change: move |e: Event<FormData>| { form_method.set(e.data().value()); } }
                         }
                         div {
                             style: "margin-bottom: 16px;",
-                            label { style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;", "分组" }
-                            Input { value: Some(form_group()), placeholder: Some("如 用户管理".to_string()), on_change: move |e: Event<FormData>| { form_group.set(e.data().value()); } }
+                            label { style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;", "{t(TKey::ApiGroup)}" }
+                            Input { value: Some(form_group()), placeholder: Some(t(TKey::ApiGroupPlaceholder)), on_change: move |e: Event<FormData>| { form_group.set(e.data().value()); } }
                         }
                         div {
                             style: "margin-bottom: 24px;",
-                            label { style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;", "描述" }
-                            Input { value: Some(form_description()), placeholder: Some("请输入API描述".to_string()), on_change: move |e: Event<FormData>| { form_description.set(e.data().value()); } }
+                            label { style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;", "{t(TKey::ApiDescription)}" }
+                            Input { value: Some(form_description()), placeholder: Some(t(TKey::ApiDescPlaceholder)), on_change: move |e: Event<FormData>| { form_description.set(e.data().value()); } }
                         }
                         div {
                             style: "display: flex; justify-content: flex-end; gap: 12px;",
-                            Button { variant: ButtonVariant::Default, on_click: move |_| { dialog_visible.set(false); }, "取消" }
-                            Button { variant: ButtonVariant::Primary, on_click: on_submit, "确定" }
+                            Button { variant: ButtonVariant::Default, on_click: move |_| { dialog_visible.set(false); }, "{t(TKey::Cancel)}" }
+                            Button { variant: ButtonVariant::Primary, on_click: on_submit, "{t(TKey::Confirm)}" }
                         }
                     }
                 }

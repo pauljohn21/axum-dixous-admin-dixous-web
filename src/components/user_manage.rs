@@ -2,6 +2,7 @@ use dioxus::prelude::*;
 use dioxus_element_plug::prelude::*;
 
 use crate::api;
+use crate::i18n::{t, t_paging, TKey};
 use crate::models::user::{SysUser, SysUserInsertDTO, SysUserUpdateDTO};
 
 /// 用户管理页面
@@ -131,11 +132,11 @@ pub fn UserManage() -> Element {
             // 页面标题
             div {
                 style: "display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;",
-                h2 { style: "font-size: 20px; font-weight: 600; color: #303030; margin: 0;", "用户管理" }
+                h2 { style: "font-size: 20px; font-weight: 600; color: #303030; margin: 0;", "{t(TKey::UserManage)}" }
                 Button {
                     variant: ButtonVariant::Primary,
                     on_click: on_add,
-                    "+ 新增用户"
+                    "{t(TKey::AddUser)}"
                 }
             }
 
@@ -154,7 +155,7 @@ pub fn UserManage() -> Element {
                     style: "flex: 1; max-width: 300px;",
                     Input {
                         value: Some(keyword()),
-                        placeholder: Some("搜索用户名/昵称/手机号".to_string()),
+                        placeholder: Some(t(TKey::SearchUserPlaceholder)),
                         on_change: move |e: Event<FormData>| {
                             keyword.set(e.data().value());
                         }
@@ -163,7 +164,7 @@ pub fn UserManage() -> Element {
                 Button {
                     variant: ButtonVariant::Primary,
                     on_click: on_search,
-                    "搜索"
+                    "{t(TKey::Search)}"
                 }
             }
 
@@ -175,12 +176,12 @@ pub fn UserManage() -> Element {
                     thead {
                         tr {
                             th { style: th_style(), "ID" }
-                            th { style: th_style(), "用户名" }
-                            th { style: th_style(), "昵称" }
-                            th { style: th_style(), "手机号" }
-                            th { style: th_style(), "邮箱" }
-                            th { style: th_style(), "状态" }
-                            th { style: th_style(), "操作" }
+                            th { style: th_style(), "{t(TKey::Username)}" }
+                            th { style: th_style(), "{t(TKey::Nickname)}" }
+                            th { style: th_style(), "{t(TKey::Phone)}" }
+                            th { style: th_style(), "{t(TKey::Email)}" }
+                            th { style: th_style(), "{t(TKey::Status)}" }
+                            th { style: th_style(), "{t(TKey::Action)}" }
                         }
                     }
                     tbody {
@@ -189,7 +190,7 @@ pub fn UserManage() -> Element {
                                 td {
                                     colspan: "7",
                                     style: "text-align: center; padding: 40px; color: #909399;",
-                                    "加载中..."
+                                    "{t(TKey::Loading)}"
                                 }
                             }
                         } else if users().is_empty() {
@@ -197,7 +198,7 @@ pub fn UserManage() -> Element {
                                 td {
                                     colspan: "7",
                                     style: "text-align: center; padding: 40px; color: #909399;",
-                                    "暂无数据"
+                                    "{t(TKey::NoData)}"
                                 }
                             }
                         } else {
@@ -214,12 +215,12 @@ pub fn UserManage() -> Element {
                                         if user.enable.unwrap_or(true) {
                                             span {
                                                 style: "display: inline-block; padding: 2px 8px; background: #f0f9eb; color: #67c23a; border-radius: 4px; font-size: 12px;",
-                                                "启用"
+                                                "{t(TKey::Enabled)}"
                                             }
                                         } else {
                                             span {
                                                 style: "display: inline-block; padding: 2px 8px; background: #fef0f0; color: #f56c6c; border-radius: 4px; font-size: 12px;",
-                                                "禁用"
+                                                "{t(TKey::Disabled)}"
                                             }
                                         }
                                     }
@@ -231,13 +232,13 @@ pub fn UserManage() -> Element {
                                                 variant: ButtonVariant::Primary,
                                                 size: Some(ButtonSize::Small),
                                                 on_click: move |_| on_delete(user.id),
-                                                "编辑"
+                                                "{t(TKey::Edit)}"
                                             }
                                             Button {
                                                 variant: ButtonVariant::Danger,
                                                 size: Some(ButtonSize::Small),
                                                 on_click: move |_| on_edit(user.clone()),
-                                                "删除"
+                                                "{t(TKey::Delete)}"
                                             }
                                         }
                                     }
@@ -252,7 +253,7 @@ pub fn UserManage() -> Element {
                     style: "display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-top: 1px solid #ebeef5;",
                     span {
                         style: "font-size: 14px; color: #909399;",
-                        "共 {total()} 条记录，第 {current_page}/{total_pages} 页"
+                        "{t_paging(total(), current_page(), total_pages)}"
                     }
                     div {
                         style: "display: flex; gap: 8px;",
@@ -264,7 +265,7 @@ pub fn UserManage() -> Element {
                                 current_page.set(current_page() - 1);
                                 fetch_users();
                             },
-                            "上一页"
+                            "{t(TKey::PrevPage)}"
                         }
                         Button {
                             variant: ButtonVariant::Default,
@@ -274,7 +275,7 @@ pub fn UserManage() -> Element {
                                 current_page.set(current_page() + 1);
                                 fetch_users();
                             },
-                            "下一页"
+                            "{t(TKey::NextPage)}"
                         }
                     }
                 }
@@ -293,17 +294,17 @@ pub fn UserManage() -> Element {
 
                         h3 {
                             style: "font-size: 18px; font-weight: 600; color: #303030; margin: 0 0 24px 0;",
-                            if is_edit() { "编辑用户" } else { "新增用户" }
+                            if is_edit() { "{t(TKey::EditUser)}" } else { "{t(TKey::AddUser)}" }
                         }
 
                         // 用户名
                         if !is_edit() {
                             div {
                                 style: "margin-bottom: 16px;",
-                                label { style: label_style(), "用户名 *" }
+                                label { style: label_style(), "{t(TKey::UsernameRequired)}" }
                                 Input {
                                     value: Some(form_username()),
-                                    placeholder: Some("请输入用户名".to_string()),
+                                    placeholder: Some(t(TKey::UsernamePlaceholder)),
                                     on_change: move |e: Event<FormData>| {
                                         form_username.set(e.data().value());
                                     }
@@ -312,11 +313,11 @@ pub fn UserManage() -> Element {
                             // 密码
                             div {
                                 style: "margin-bottom: 16px;",
-                                label { style: label_style(), "密码 *" }
+                                label { style: label_style(), "{t(TKey::PasswordRequired)}" }
                                 Input {
                                     value: Some(form_password()),
                                     input_type: InputType::Password,
-                                    placeholder: Some("请输入密码".to_string()),
+                                    placeholder: Some(t(TKey::PasswordPlaceholder)),
                                     on_change: move |e: Event<FormData>| {
                                         form_password.set(e.data().value());
                                     }
@@ -327,10 +328,10 @@ pub fn UserManage() -> Element {
                         // 昵称
                         div {
                             style: "margin-bottom: 16px;",
-                            label { style: label_style(), "昵称" }
+                            label { style: label_style(), "{t(TKey::Nickname)}" }
                             Input {
                                 value: Some(form_nick_name()),
-                                placeholder: Some("请输入昵称".to_string()),
+                                placeholder: Some(t(TKey::NicknamePlaceholder)),
                                 on_change: move |e: Event<FormData>| {
                                     form_nick_name.set(e.data().value());
                                 }
@@ -339,10 +340,10 @@ pub fn UserManage() -> Element {
                         // 手机号
                         div {
                             style: "margin-bottom: 16px;",
-                            label { style: label_style(), "手机号" }
+                            label { style: label_style(), "{t(TKey::Phone)}" }
                             Input {
                                 value: Some(form_phone()),
-                                placeholder: Some("请输入手机号".to_string()),
+                                placeholder: Some(t(TKey::PhonePlaceholder)),
                                 on_change: move |e: Event<FormData>| {
                                     form_phone.set(e.data().value());
                                 }
@@ -351,10 +352,10 @@ pub fn UserManage() -> Element {
                         // 邮箱
                         div {
                             style: "margin-bottom: 24px;",
-                            label { style: label_style(), "邮箱" }
+                            label { style: label_style(), "{t(TKey::Email)}" }
                             Input {
                                 value: Some(form_email()),
-                                placeholder: Some("请输入邮箱".to_string()),
+                                placeholder: Some(t(TKey::EmailPlaceholder)),
                                 on_change: move |e: Event<FormData>| {
                                     form_email.set(e.data().value());
                                 }
@@ -369,12 +370,12 @@ pub fn UserManage() -> Element {
                                 on_click: move |_| {
                                     dialog_visible.set(false);
                                 },
-                                "取消"
+                                "{t(TKey::Cancel)}"
                             }
                             Button {
                                 variant: ButtonVariant::Primary,
                                 on_click: on_submit,
-                                "确定"
+                                "{t(TKey::Confirm)}"
                             }
                         }
                     }

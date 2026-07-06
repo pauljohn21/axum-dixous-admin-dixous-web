@@ -2,6 +2,7 @@ use dioxus::prelude::*;
 use dioxus_element_plug::prelude::*;
 
 use crate::api;
+use crate::i18n::{t, t_paging, TKey};
 use crate::models::dictionary::{SysDictionary, SysDictionaryInsertDTO, SysDictionaryUpdateDTO};
 
 /// 字典管理页面
@@ -103,8 +104,8 @@ pub fn DictManage() -> Element {
         div {
             div {
                 style: "display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;",
-                h2 { style: "font-size: 20px; font-weight: 600; color: #303030; margin: 0;", "字典管理" }
-                Button { variant: ButtonVariant::Primary, on_click: on_add, "+ 新增字典" }
+                h2 { style: "font-size: 20px; font-weight: 600; color: #303030; margin: 0;", "{t(TKey::DictManage)}" }
+                Button { variant: ButtonVariant::Primary, on_click: on_add, "{t(TKey::AddDict)}" }
             }
 
             if let Some(msg) = error_msg() {
@@ -117,11 +118,11 @@ pub fn DictManage() -> Element {
                     style: "flex: 1; max-width: 300px;",
                     Input {
                         value: Some(keyword()),
-                        placeholder: Some("搜索字典名称/编码".to_string()),
+                        placeholder: Some(t(TKey::SearchDictPlaceholder)),
                         on_change: move |e: Event<FormData>| { keyword.set(e.data().value()); }
                     }
                 }
-                Button { variant: ButtonVariant::Primary, on_click: move |_| { current_page.set(1); fetch_dicts(); }, "搜索" }
+                Button { variant: ButtonVariant::Primary, on_click: move |_| { current_page.set(1); fetch_dicts(); }, "{t(TKey::Search)}" }
             }
 
             div {
@@ -131,17 +132,17 @@ pub fn DictManage() -> Element {
                     thead {
                         tr {
                             th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "ID" }
-                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "字典名称" }
-                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "编码" }
-                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "描述" }
-                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "操作" }
+                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "{t(TKey::DictName)}" }
+                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "{t(TKey::DictCode)}" }
+                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "{t(TKey::DictDesc)}" }
+                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "{t(TKey::Action)}" }
                         }
                     }
                     tbody {
                         if loading() {
-                            tr { td { colspan: "5", style: "text-align: center; padding: 40px; color: #909399;", "加载中..." } }
+                            tr { td { colspan: "5", style: "text-align: center; padding: 40px; color: #909399;", "{t(TKey::Loading)}" } }
                         } else if dicts().is_empty() {
-                            tr { td { colspan: "5", style: "text-align: center; padding: 40px; color: #909399;", "暂无数据" } }
+                            tr { td { colspan: "5", style: "text-align: center; padding: 40px; color: #909399;", "{t(TKey::NoData)}" } }
                         } else {
                             for item in dicts() {
                                 tr {
@@ -157,8 +158,8 @@ pub fn DictManage() -> Element {
                                         style: "padding: 12px 16px;",
                                         div {
                                             style: "display: flex; gap: 8px;",
-                                            Button { variant: ButtonVariant::Primary, size: Some(ButtonSize::Small), on_click: move |_| on_delete(item.id), "编辑" }
-                                            Button { variant: ButtonVariant::Danger, size: Some(ButtonSize::Small), on_click: move |_| on_edit(item.clone()), "删除" }
+                                            Button { variant: ButtonVariant::Primary, size: Some(ButtonSize::Small), on_click: move |_| on_delete(item.id), "{t(TKey::Edit)}" }
+                                            Button { variant: ButtonVariant::Danger, size: Some(ButtonSize::Small), on_click: move |_| on_edit(item.clone()), "{t(TKey::Delete)}" }
                                         }
                                     }
                                 }
@@ -169,11 +170,11 @@ pub fn DictManage() -> Element {
 
                 div {
                     style: "display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-top: 1px solid #ebeef5;",
-                    span { style: "font-size: 14px; color: #909399;", "共 {total()} 条记录，第 {current_page}/{total_pages} 页" }
+                    span { style: "font-size: 14px; color: #909399;", "{t_paging(total(), current_page(), total_pages)}" }
                     div {
                         style: "display: flex; gap: 8px;",
-                        Button { variant: ButtonVariant::Default, size: Some(ButtonSize::Small), disabled: current_page() <= 1, on_click: move |_| { current_page.set(current_page() - 1); fetch_dicts(); }, "上一页" }
-                        Button { variant: ButtonVariant::Default, size: Some(ButtonSize::Small), disabled: current_page() >= total_pages as u32, on_click: move |_| { current_page.set(current_page() + 1); fetch_dicts(); }, "下一页" }
+                        Button { variant: ButtonVariant::Default, size: Some(ButtonSize::Small), disabled: current_page() <= 1, on_click: move |_| { current_page.set(current_page() - 1); fetch_dicts(); }, "{t(TKey::PrevPage)}" }
+                        Button { variant: ButtonVariant::Default, size: Some(ButtonSize::Small), disabled: current_page() >= total_pages as u32, on_click: move |_| { current_page.set(current_page() + 1); fetch_dicts(); }, "{t(TKey::NextPage)}" }
                     }
                 }
             }
@@ -185,26 +186,26 @@ pub fn DictManage() -> Element {
                     div {
                         style: "background: white; border-radius: 8px; padding: 24px; width: 480px;",
                         onclick: move |e: MouseEvent| { e.stop_propagation(); },
-                        h3 { style: "font-size: 18px; font-weight: 600; color: #303030; margin: 0 0 24px 0;", if is_edit() { "编辑字典" } else { "新增字典" } }
+                        h3 { style: "font-size: 18px; font-weight: 600; color: #303030; margin: 0 0 24px 0;", if is_edit() { "{t(TKey::EditDict)}" } else { "{t(TKey::AddDict)}" } }
                         div {
                             style: "margin-bottom: 16px;",
-                            label { style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;", "字典名称 *" }
-                            Input { value: Some(form_name()), placeholder: Some("请输入字典名称".to_string()), on_change: move |e: Event<FormData>| { form_name.set(e.data().value()); } }
+                            label { style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;", "{t(TKey::DictName)} *" }
+                            Input { value: Some(form_name()), placeholder: Some(t(TKey::DictNamePlaceholder)), on_change: move |e: Event<FormData>| { form_name.set(e.data().value()); } }
                         }
                         div {
                             style: "margin-bottom: 16px;",
-                            label { style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;", "编码 *" }
-                            Input { value: Some(form_code()), placeholder: Some("请输入字典编码".to_string()), on_change: move |e: Event<FormData>| { form_code.set(e.data().value()); } }
+                            label { style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;", "{t(TKey::DictCode)} *" }
+                            Input { value: Some(form_code()), placeholder: Some(t(TKey::DictCodePlaceholder)), on_change: move |e: Event<FormData>| { form_code.set(e.data().value()); } }
                         }
                         div {
                             style: "margin-bottom: 24px;",
-                            label { style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;", "描述" }
-                            Input { value: Some(form_desc()), placeholder: Some("请输入描述".to_string()), on_change: move |e: Event<FormData>| { form_desc.set(e.data().value()); } }
+                            label { style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;", "{t(TKey::DictDesc)}" }
+                            Input { value: Some(form_desc()), placeholder: Some(t(TKey::DictDescPlaceholder)), on_change: move |e: Event<FormData>| { form_desc.set(e.data().value()); } }
                         }
                         div {
                             style: "display: flex; justify-content: flex-end; gap: 12px;",
-                            Button { variant: ButtonVariant::Default, on_click: move |_| { dialog_visible.set(false); }, "取消" }
-                            Button { variant: ButtonVariant::Primary, on_click: on_submit, "确定" }
+                            Button { variant: ButtonVariant::Default, on_click: move |_| { dialog_visible.set(false); }, "{t(TKey::Cancel)}" }
+                            Button { variant: ButtonVariant::Primary, on_click: on_submit, "{t(TKey::Confirm)}" }
                         }
                     }
                 }

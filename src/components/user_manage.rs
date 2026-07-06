@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use dioxus_element_plug::prelude::*;
 
 use crate::api;
-use crate::api::user::{SysUser, SysUserInsertDTO, SysUserUpdateDTO};
+use crate::models::user::{SysUser, SysUserInsertDTO, SysUserUpdateDTO};
 
 /// 用户管理页面
 #[component]

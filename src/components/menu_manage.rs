@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use dioxus_element_plug::prelude::*;
 
 use crate::api;
-use crate::api::menu::{SysMenu, SysMenuInsertDTO, SysMenuUpdateDTO};
+use crate::models::menu::{SysMenu, SysMenuInsertDTO, SysMenuUpdateDTO};
 
 /// 菜单管理页面
 #[component]
@@ -73,7 +73,7 @@ pub fn MenuManage() -> Element {
     };
 
     let on_submit = move |_| {
-        let sort_val = form_sort().parse::<i32>().unwrap_or(0);
+        let sort_val = form_sort().parse::<i64>().unwrap_or(0);
         if is_edit() {
             let dto = SysMenuUpdateDTO {
                 name: if form_name().is_empty() { None } else { Some(form_name()) },

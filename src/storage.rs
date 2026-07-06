@@ -1,5 +1,7 @@
 use web_sys::Storage;
 
+use crate::config::TOKEN_KEY;
+
 /// 获取 localStorage 对象
 fn local_storage() -> Option<Storage> {
     let window = web_sys::window()?;
@@ -33,8 +35,6 @@ pub fn clear() {
 }
 
 // ===== Token 便捷方法 =====
-
-const TOKEN_KEY: &str = "admin_token";
 
 /// 获取当前 token
 pub fn get_token() -> Option<String> {

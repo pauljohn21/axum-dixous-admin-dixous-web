@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use dioxus_element_plug::prelude::*;
 
 use crate::api;
-use crate::api::sys_api::{SysApi, SysApiInsertDTO, SysApiUpdateDTO};
+use crate::models::sys_api::{SysApi, SysApiInsertDTO, SysApiUpdateDTO};
 
 fn method_color(method: &str) -> String {
     match method {

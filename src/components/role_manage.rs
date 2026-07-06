@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use dioxus_element_plug::prelude::*;
 
 use crate::api;
-use crate::api::role::{SysRole, SysRoleInsertDTO, SysRoleUpdateDTO};
+use crate::models::role::{SysRole, SysRoleInsertDTO, SysRoleUpdateDTO};
 
 /// 角色管理页面
 #[component]

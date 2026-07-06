@@ -2,7 +2,8 @@ use dioxus::prelude::*;
 use dioxus_element_plug::prelude::*;
 
 use crate::api;
-use crate::Route;
+use crate::router::Route;
+use crate::storage;
 
 /// 登录页面
 #[component]
@@ -27,7 +28,7 @@ pub fn Login() -> Element {
         spawn(async move {
             match api::auth::login(username_val, password_val).await {
                 Ok(resp) => {
-                    crate::storage::set_token(&resp.token);
+                    storage::set_token(&resp.token);
                     navigator.replace(Route::Dashboard {});
                 }
                 Err(e) => {

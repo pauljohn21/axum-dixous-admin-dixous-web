@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use dioxus_element_plug::prelude::*;
 
 use crate::api;
-use crate::api::dictionary::{SysDictionary, SysDictionaryInsertDTO, SysDictionaryUpdateDTO};
+use crate::models::dictionary::{SysDictionary, SysDictionaryInsertDTO, SysDictionaryUpdateDTO};
 
 /// 字典管理页面
 #[component]

@@ -1,66 +1,6 @@
-use serde::{Deserialize, Serialize};
-
-use super::{get_with_query, post, put, delete, build_page_query, PageResponse};
-
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct SysMenu {
-    pub id: i32,
-    #[serde(default)]
-    pub parent_id: Option<i32>,
-    #[serde(default)]
-    pub name: Option<String>,
-    #[serde(default)]
-    pub path: Option<String>,
-    #[serde(default)]
-    pub component: Option<String>,
-    #[serde(default)]
-    pub icon: Option<String>,
-    #[serde(default)]
-    pub sort: Option<i32>,
-    #[serde(default)]
-    pub hidden: Option<bool>,
-    #[serde(default)]
-    pub title: Option<String>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SysMenuInsertDTO {
-    pub name: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub parent_id: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub path: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub component: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub icon: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub sort: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub hidden: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub title: Option<String>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SysMenuUpdateDTO {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub parent_id: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub path: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub component: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub icon: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub sort: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub hidden: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub title: Option<String>,
-}
+use crate::http::{build_page_query, delete, get_with_query, post, put};
+use crate::models::common::PageResponse;
+use crate::models::menu::{SysMenu, SysMenuInsertDTO, SysMenuUpdateDTO};
 
 pub async fn list(
     page: Option<u32>,

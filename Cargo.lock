@@ -5707,7 +5707,6 @@ dependencies = [
  "serde",
  "serde_json",
  "urlencoding",
- "web-sys",
 ]
 
 [[package]]

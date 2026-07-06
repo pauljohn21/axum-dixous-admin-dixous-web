@@ -48,28 +48,29 @@ pub struct PageResponse<T> {
     pub page_size: u32,
 }
 
-// ===== Token 管理 =====
+// ===== Token 管理（内存，不使用 localStorage） =====
+//
+// 使用 thread_local + RefCell 存储在内存中：
+// - XSS 攻击无法通过 JS 读取内存中的 token（localStorage 可被任意 JS 读取）
+// - 页面刷新后 token 丢失，用户需重新登录，符合安全最佳实践
 
+thread_local! {
+    static TOKEN: std::cell::RefCell<Option<String>> = const { std::cell::RefCell::new(None) };
+}
+
+/// 获取当前 token
 pub fn get_token() -> Option<String> {
-    let win = web_sys::window()?;
-    let storage = win.local_storage().ok()??;
-    storage.get_item("token").ok()?
+    TOKEN.with(|t| t.borrow().clone())
 }
 
+/// 设置 token
 pub fn set_token(token: &str) {
-    if let Some(win) = web_sys::window() {
-        if let Ok(Some(storage)) = win.local_storage() {
-            let _ = storage.set_item("token", token);
-        }
-    }
+    TOKEN.with(|t| *t.borrow_mut() = Some(token.to_string()));
 }
 
+/// 清除 token
 pub fn clear_token() {
-    if let Some(win) = web_sys::window() {
-        if let Ok(Some(storage)) = win.local_storage() {
-            let _ = storage.remove_item("token");
-        }
-    }
+    TOKEN.with(|t| *t.borrow_mut() = None);
 }
 
 // ===== HTTP 请求封装 =====

@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use dioxus_element_plug::prelude::*;
 
 use crate::api;
-use crate::components::menu_item::MenuItem;
+use crate::components::menu_item::{MenuItem, MENU_CSS};
 use crate::i18n::{current_locale, set_locale, t, Locale, TKey};
 use crate::models::menu::{build_menu_tree, MenuTreeNode};
 use crate::router::Route;
@@ -65,6 +65,9 @@ pub fn AdminLayout() -> Element {
         .unwrap_or_default();
 
     rsx! {
+        // 注入菜单 CSS
+        style { "{MENU_CSS}" }
+
         div {
             style: "display: flex; min-height: 100vh; background: #f0f2f5;",
 

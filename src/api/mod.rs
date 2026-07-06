@@ -48,29 +48,33 @@ pub struct PageResponse<T> {
     pub page_size: u32,
 }
 
-// ===== Token 管理（内存，不使用 localStorage） =====
-//
-// 使用 thread_local + RefCell 存储在内存中：
-// - XSS 攻击无法通过 JS 读取内存中的 token（localStorage 可被任意 JS 读取）
-// - 页面刷新后 token 丢失，用户需重新登录，符合安全最佳实践
+// ===== Token 管理（localStorage） =====
 
-thread_local! {
-    static TOKEN: std::cell::RefCell<Option<String>> = const { std::cell::RefCell::new(None) };
-}
+const TOKEN_KEY: &str = "admin_token";
 
-/// 获取当前 token
+/// 获取当前 token（从 localStorage 读取）
 pub fn get_token() -> Option<String> {
-    TOKEN.with(|t| t.borrow().clone())
+    let window = web_sys::window()?;
+    let storage = window.local_storage().ok()??;
+    storage.get_item(TOKEN_KEY).ok()?
 }
 
-/// 设置 token
+/// 设置 token（写入 localStorage）
 pub fn set_token(token: &str) {
-    TOKEN.with(|t| *t.borrow_mut() = Some(token.to_string()));
+    if let Some(window) = web_sys::window() {
+        if let Ok(Some(storage)) = window.local_storage() {
+            let _ = storage.set_item(TOKEN_KEY, token);
+        }
+    }
 }
 
-/// 清除 token
+/// 清除 token（从 localStorage 移除）
 pub fn clear_token() {
-    TOKEN.with(|t| *t.borrow_mut() = None);
+    if let Some(window) = web_sys::window() {
+        if let Ok(Some(storage)) = window.local_storage() {
+            let _ = storage.remove_item(TOKEN_KEY);
+        }
+    }
 }
 
 // ===== HTTP 请求封装 =====

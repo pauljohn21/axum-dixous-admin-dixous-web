@@ -8,6 +8,8 @@ pub mod dictionary;
 use serde::{Deserialize, Serialize};
 use gloo_net::http::Request;
 
+use crate::storage;
+
 const BASE_URL: &str = "http://localhost:8888";
 
 /// 统一响应结构
@@ -48,35 +50,6 @@ pub struct PageResponse<T> {
     pub page_size: u32,
 }
 
-// ===== Token 管理（localStorage） =====
-
-const TOKEN_KEY: &str = "admin_token";
-
-/// 获取当前 token（从 localStorage 读取）
-pub fn get_token() -> Option<String> {
-    let window = web_sys::window()?;
-    let storage = window.local_storage().ok()??;
-    storage.get_item(TOKEN_KEY).ok()?
-}
-
-/// 设置 token（写入 localStorage）
-pub fn set_token(token: &str) {
-    if let Some(window) = web_sys::window() {
-        if let Ok(Some(storage)) = window.local_storage() {
-            let _ = storage.set_item(TOKEN_KEY, token);
-        }
-    }
-}
-
-/// 清除 token（从 localStorage 移除）
-pub fn clear_token() {
-    if let Some(window) = web_sys::window() {
-        if let Ok(Some(storage)) = window.local_storage() {
-            let _ = storage.remove_item(TOKEN_KEY);
-        }
-    }
-}
-
 // ===== HTTP 请求封装 =====
 
 fn build_url(path: &str) -> String {
@@ -84,7 +57,7 @@ fn build_url(path: &str) -> String {
 }
 
 fn add_auth_header(builder: gloo_net::http::RequestBuilder) -> gloo_net::http::RequestBuilder {
-    if let Some(token) = get_token() {
+    if let Some(token) = storage::get_token() {
         builder.header("Authorization", &format!("Bearer {}", token))
     } else {
         builder
@@ -96,7 +69,7 @@ pub async fn get<T: serde::de::DeserializeOwned>(path: &str) -> Result<T, String
     let builder = add_auth_header(Request::get(&url));
     let resp = builder.send().await.map_err(|e| e.to_string())?;
     if resp.status() == 401 {
-        clear_token();
+        storage::clear_token();
         return Err("未授权，请重新登录".into());
     }
     let body: R<T> = resp.json().await.map_err(|e| e.to_string())?;
@@ -119,7 +92,7 @@ pub async fn get_with_query<T: serde::de::DeserializeOwned>(
     let builder = add_auth_header(Request::get(&url));
     let resp = builder.send().await.map_err(|e| e.to_string())?;
     if resp.status() == 401 {
-        clear_token();
+        storage::clear_token();
         return Err("未授权，请重新登录".into());
     }
     let body: R<T> = resp.json().await.map_err(|e| e.to_string())?;
@@ -142,7 +115,7 @@ pub async fn post<T: serde::de::DeserializeOwned, B: serde::Serialize>(
     let request = builder.body(body_str).map_err(|e| e.to_string())?;
     let resp = request.send().await.map_err(|e| e.to_string())?;
     if resp.status() == 401 {
-        clear_token();
+        storage::clear_token();
         return Err("未授权，请重新登录".into());
     }
     let body: R<T> = resp.json().await.map_err(|e| e.to_string())?;
@@ -165,7 +138,7 @@ pub async fn put<T: serde::de::DeserializeOwned, B: serde::Serialize>(
     let request = builder.body(body_str).map_err(|e| e.to_string())?;
     let resp = request.send().await.map_err(|e| e.to_string())?;
     if resp.status() == 401 {
-        clear_token();
+        storage::clear_token();
         return Err("未授权，请重新登录".into());
     }
     let body: R<T> = resp.json().await.map_err(|e| e.to_string())?;
@@ -181,7 +154,7 @@ pub async fn delete<T: serde::de::DeserializeOwned>(path: &str) -> Result<T, Str
     let builder = add_auth_header(Request::delete(&url));
     let resp = builder.send().await.map_err(|e| e.to_string())?;
     if resp.status() == 401 {
-        clear_token();
+        storage::clear_token();
         return Err("未授权，请重新登录".into());
     }
     let body: R<T> = resp.json().await.map_err(|e| e.to_string())?;

@@ -49,7 +49,7 @@ pub fn AdminLayout() -> Element {
 
     // 获取用户信息（含菜单）
     let user_info = use_resource(move || async move {
-        if api::get_token().is_some() {
+        if crate::storage::get_token().is_some() {
             api::auth::get_user_info().await.ok()
         } else {
             None
@@ -58,7 +58,7 @@ pub fn AdminLayout() -> Element {
 
     // 如果没有token，跳转登录
     use_effect(move || {
-        if api::get_token().is_none() {
+        if crate::storage::get_token().is_none() {
             navigator.replace(Route::Login {});
         }
     });
@@ -80,7 +80,7 @@ pub fn AdminLayout() -> Element {
     });
 
     let do_logout = move |_| {
-        api::clear_token();
+        crate::storage::clear_token();
         navigator.replace(Route::Login {});
     };
 

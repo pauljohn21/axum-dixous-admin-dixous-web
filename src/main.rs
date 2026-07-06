@@ -1,5 +1,6 @@
 mod api;
 mod components;
+mod storage;
 
 use dioxus::prelude::*;
 use dioxus::router::Link;

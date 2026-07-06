@@ -27,7 +27,7 @@ pub fn Login() -> Element {
         spawn(async move {
             match api::auth::login(username_val, password_val).await {
                 Ok(resp) => {
-                    api::set_token(&resp.token);
+                    crate::storage::set_token(&resp.token);
                     navigator.replace(Route::Dashboard {});
                 }
                 Err(e) => {

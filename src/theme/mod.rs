@@ -18,6 +18,18 @@ pub enum ThemeMode {
     Dark,
 }
 
+impl std::str::FromStr for ThemeMode {
+    type Err = &'static str;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "light" => Ok(ThemeMode::Light),
+            "dark" => Ok(ThemeMode::Dark),
+            _ => Err("不支持的主题模式，支持: 'light' 或 'dark'"),
+        }
+    }
+}
+
 impl ThemeMode {
     /// 返回用于 CSS data-theme 属性的字符串
     pub fn as_str(&self) -> &'static str {
@@ -27,13 +39,6 @@ impl ThemeMode {
         }
     }
 
-    /// 从 localStorage 字符串解析
-    pub fn from_str(s: &str) -> Self {
-        match s {
-            "dark" => ThemeMode::Dark,
-            _ => ThemeMode::Light,
-        }
-    }
 
 }
 
@@ -46,7 +51,7 @@ static GLOBAL_THEME: LazyLock<RwLock<ThemeMode>> =
 /// 初始化主题 (从 localStorage 读取) — 在 main() 中调用
 pub fn init_theme() {
     if let Some(stored) = crate::storage::get(THEME_KEY) {
-        let mode = ThemeMode::from_str(&stored);
+        let mode = stored.parse::<ThemeMode>().unwrap_or(ThemeMode::Light);
         *GLOBAL_THEME.write().unwrap() = mode;
     } else {
         // 检测系统偏好
@@ -98,7 +103,7 @@ pub fn toggle_theme() {
 
 /// 生成主题 CSS — 包含亮色和暗色两套 CSS 变量
 /// 通过 [data-theme="dark"] 选择器覆盖 :root 变量
-pub fn theme_css() -> &'static str {
+pub fn theme_css() -> String {
     r#"
 :root {
     /* ===== 亮色主题 (默认) ===== */
@@ -125,7 +130,7 @@ pub fn theme_css() -> &'static str {
     --el-text-color-primary: #303133;
     --el-text-color-regular: #606266;
     --el-text-color-secondary: #909399;
-    --el-text-color-placeholder: #c0c4cc;
+    --el-text-color-placeholder: #a8abb2;
     --el-text-color-disabled: #c0c4cc;
 
     /* 边框色 */
@@ -247,5 +252,5 @@ pub fn theme_css() -> &'static str {
                 border-color var(--el-transition-duration),
                 color var(--el-transition-duration);
 }
-"#
+"#.to_string()
 }

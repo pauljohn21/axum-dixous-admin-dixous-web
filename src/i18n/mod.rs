@@ -1,73 +1,22 @@
-use std::sync::{LazyLock, RwLock};
+//! 项目 i18n 模块 — 薄包装层
+//!
+//! 通用 Locale / Signal 管理由 `dioxus-i18n` crate 提供，
+//! 本模块仅保留业务翻译表 (TKey + t_zh / t_en) 和 localStorage 注入。
 
-use dioxus::prelude::*;
+// 从 crate 重新导出通用 API（调用方无需改 import）
+pub use dioxus_i18n::{current_locale, provide_locale, Locale};
 
-/// 支持的语言
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Locale {
-    ZhCN,
-    EnUS,
-}
-
-impl Locale {
-    pub fn label(&self) -> &'static str {
-        match self {
-            Locale::ZhCN => "中文",
-            Locale::EnUS => "English",
-        }
-    }
-
-    pub fn from_str(s: &str) -> Self {
-        match s {
-            "en-US" => Locale::EnUS,
-            _ => Locale::ZhCN,
-        }
-    }
-
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            Locale::ZhCN => "zh-CN",
-            Locale::EnUS => "en-US",
-        }
-    }
-}
-
+/// localStorage key
 const LOCALE_KEY: &str = "admin_locale";
-
-/// 非响应式全局存储（供 t() 读取）
-static GLOBAL_LOCALE: LazyLock<RwLock<Locale>> =
-    LazyLock::new(|| RwLock::new(Locale::ZhCN));
 
 /// 初始化语言（从 localStorage 读取）
 pub fn init_locale() {
-    if let Some(stored) = crate::storage::get(LOCALE_KEY) {
-        *GLOBAL_LOCALE.write().unwrap() = Locale::from_str(&stored);
-    }
+    dioxus_i18n::init_locale(|| crate::storage::get(LOCALE_KEY));
 }
 
-/// 在 App 根组件中调用 — 提供响应式 Locale Signal
-pub fn provide_locale() {
-    let initial = *GLOBAL_LOCALE.read().unwrap();
-    let signal = use_signal(move || initial);
-    use_context_provider(|| signal);
-}
-
-/// 获取当前响应式 Locale Signal（组件渲染期可用）
-pub fn locale_signal() -> Signal<Locale> {
-    use_context::<Signal<Locale>>()
-}
-
-/// 获取当前语言（响应式 — 渲染期调用会订阅 Signal）
-pub fn current_locale() -> Locale {
-    let sig = locale_signal();
-    sig()
-}
-
-/// 切换语言并持久化
+/// 切换语言并持久化到 localStorage
 pub fn set_locale(locale: Locale) {
-    *GLOBAL_LOCALE.write().unwrap() = locale;
-    crate::storage::set(LOCALE_KEY, locale.as_str());
-    locale_signal().set(locale);
+    dioxus_i18n::set_locale(locale, |s| crate::storage::set(LOCALE_KEY, s));
 }
 
 /// 翻译 key 枚举

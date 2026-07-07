@@ -12,6 +12,7 @@ dioxus-element-plug = "0.2.0"
 route-guard = { path = "crates/route-guard" }
 element-icons = { path = "crates/element-icons" }
 dioxus-i18n = { path = "crates/dioxus-i18n" }
+slider-captcha = { path = "crates/slider-captcha" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 web-sys = { version = "0.3", features = ["Storage", "Window", "MediaQueryList"] }
@@ -25,4 +26,4 @@ desktop = ["dioxus/desktop"]
 mobile = ["dioxus/mobile"]
 
 [workspace]
-members = ["crates/route-guard", "crates/element-icons", "crates/dioxus-i18n"]
+members = ["crates/route-guard", "crates/element-icons", "crates/dioxus-i18n", "crates/slider-captcha"]

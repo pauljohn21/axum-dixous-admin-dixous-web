@@ -55,6 +55,8 @@ pub enum TKey {
     // 个人信息和设置
     Profile, Settings, BasicInfo, Avatar, Guest, SystemSettings, Language, Theme, ComingSoon,
     ThemeMode, LightMode, DarkMode, ThemeColor, PrimaryColor, SuccessColor, WarningColor, DangerColor,
+    // 滑块验证
+    SliderVerify, SliderVerified, SliderVerifyFirst,
 }
 
 /// 翻译函数（响应式 — 渲染期调用会订阅 locale Signal）
@@ -125,6 +127,7 @@ fn t_zh(key: TKey) -> String {
         TKey::ThemeMode => "主题模式", TKey::LightMode => "亮色", TKey::DarkMode => "暗色",
         TKey::ThemeColor => "主题色", TKey::PrimaryColor => "主色", TKey::SuccessColor => "成功色",
         TKey::WarningColor => "警告色", TKey::DangerColor => "危险色",
+        TKey::SliderVerify => "请拖动滑块验证", TKey::SliderVerified => "验证通过", TKey::SliderVerifyFirst => "请先完成滑块验证",
     }.into()
 }
 
@@ -180,5 +183,6 @@ fn t_en(key: TKey) -> String {
         TKey::ThemeMode => "Theme Mode", TKey::LightMode => "Light", TKey::DarkMode => "Dark",
         TKey::ThemeColor => "Theme Color", TKey::PrimaryColor => "Primary", TKey::SuccessColor => "Success",
         TKey::WarningColor => "Warning", TKey::DangerColor => "Danger",
+        TKey::SliderVerify => "Drag slider to verify", TKey::SliderVerified => "Verified", TKey::SliderVerifyFirst => "Please complete slider verification first",
     }.into()
 }

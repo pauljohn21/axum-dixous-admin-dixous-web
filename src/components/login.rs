@@ -5,6 +5,7 @@ use crate::api;
 use crate::i18n::{current_locale, set_locale, t, Locale, TKey};
 use crate::router::Route;
 use crate::storage;
+use slider_captcha::SliderCaptcha;
 
 /// 登录页面
 #[component]
@@ -13,6 +14,7 @@ pub fn Login() -> Element {
     let mut password = use_signal(String::new);
     let mut error_msg = use_signal(|| None::<String>);
     let mut loading = use_signal(|| false);
+    let mut captcha_verified = use_signal(|| false);
     let navigator = navigator();
 
     let do_login = move |_| {
@@ -20,6 +22,10 @@ pub fn Login() -> Element {
         let password_val = password();
         if username_val.is_empty() || password_val.is_empty() {
             error_msg.set(Some(t(TKey::UsernamePasswordRequired)));
+            return;
+        }
+        if !captcha_verified() {
+            error_msg.set(Some(t(TKey::SliderVerifyFirst)));
             return;
         }
 
@@ -105,11 +111,20 @@ pub fn Login() -> Element {
                     }
                 }
 
+                // 滑块验证码
+                SliderCaptcha {
+                    placeholder: t(TKey::SliderVerify),
+                    success_text: t(TKey::SliderVerified),
+                    on_success: move |_| {
+                        captcha_verified.set(true);
+                    }
+                }
+
                 // 登录按钮
                 Button {
                     variant: ButtonVariant::Primary,
                     size: Some(ButtonSize::Large),
-                    disabled: loading(),
+                    disabled: loading() || !captcha_verified(),
                     style: Some("width: 100%;".to_string()),
                     on_click: do_login,
                     if loading() { "{t(TKey::LoggingIn)}" } else { "{t(TKey::Login)}" }

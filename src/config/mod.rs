@@ -6,3 +6,7 @@ pub const TOKEN_KEY: &str = "admin_token";
 
 /// localStorage username key
 pub const USERNAME_KEY: &str = "admin_username";
+
+/// localStorage theme key
+#[allow(dead_code)]
+pub const THEME_KEY: &str = "admin_theme";

@@ -75,13 +75,22 @@ pub fn UserManage() -> Element {
         dialog_visible.set(true);
     };
 
+    let mut delete_target = use_signal(|| None::<i32>);
+
     let mut on_delete = move |id: i32| {
-        spawn(async move {
-            match api::user::delete_user(id).await {
-                Ok(_) => { fetch_users(); }
-                Err(e) => { error_msg.set(Some(e)); }
-            }
-        });
+        delete_target.set(Some(id));
+    };
+
+    let confirm_delete = move |_| {
+        if let Some(id) = delete_target() {
+            spawn(async move {
+                match api::user::delete_user(id).await {
+                    Ok(_) => { fetch_users(); }
+                    Err(e) => { error_msg.set(Some(e)); }
+                }
+            });
+        }
+        delete_target.set(None);
     };
 
     let on_submit = move |_| {
@@ -125,14 +134,14 @@ pub fn UserManage() -> Element {
         }
     };
 
-    let total_pages = (total() + page_size as u64 - 1) / page_size as u64;
+    let total_pages = total().div_ceil(page_size as u64);
 
     rsx! {
         div {
             // 页面标题
             div {
                 style: "display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;",
-                h2 { style: "font-size: 20px; font-weight: 600; color: #303030; margin: 0;", "{t(TKey::UserManage)}" }
+                h2 { style: "font-size: 20px; font-weight: 600; color: var(--el-text-color-primary); margin: 0;", "{t(TKey::UserManage)}" }
                 Button {
                     variant: ButtonVariant::Primary,
                     on_click: on_add,
@@ -143,14 +152,14 @@ pub fn UserManage() -> Element {
             // 错误提示
             if let Some(msg) = error_msg() {
                 div {
-                    style: "background: #fef0f0; color: #f56c6c; border-radius: 4px; padding: 10px 16px; margin-bottom: 16px; font-size: 14px;",
+                    style: "background: var(--el-color-danger-light-9); color: var(--el-color-danger); border-radius: 4px; padding: 10px 16px; margin-bottom: 16px; font-size: 14px;",
                     "{msg}"
                 }
             }
 
             // 搜索栏
             div {
-                style: "display: flex; gap: 12px; margin-bottom: 20px; background: white; padding: 16px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.04);",
+                style: "display: flex; gap: 12px; margin-bottom: 20px; background: var(--el-bg-color); padding: 16px; border-radius: 8px; box-shadow: var(--el-box-shadow-light);",
                 div {
                     style: "flex: 1; max-width: 300px;",
                     Input {
@@ -170,7 +179,7 @@ pub fn UserManage() -> Element {
 
             // 数据表格
             div {
-                style: "background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); overflow: hidden;",
+                style: "background: var(--el-bg-color); border-radius: 8px; box-shadow: var(--el-box-shadow-light); overflow: hidden;",
                 table {
                     style: "width: 100%; border-collapse: collapse;",
                     thead {
@@ -189,7 +198,7 @@ pub fn UserManage() -> Element {
                             tr {
                                 td {
                                     colspan: "7",
-                                    style: "text-align: center; padding: 40px; color: #909399;",
+                                    style: "text-align: center; padding: 40px; color: var(--el-text-color-secondary);",
                                     "{t(TKey::Loading)}"
                                 }
                             }
@@ -197,14 +206,14 @@ pub fn UserManage() -> Element {
                             tr {
                                 td {
                                     colspan: "7",
-                                    style: "text-align: center; padding: 40px; color: #909399;",
+                                    style: "text-align: center; padding: 40px; color: var(--el-text-color-secondary);",
                                     "{t(TKey::NoData)}"
                                 }
                             }
                         } else {
                             for user in users() {
                                 tr {
-                                    style: "border-bottom: 1px solid #ebeef5;",
+                                    style: "border-bottom: 1px solid var(--el-border-color-lighter);",
                                     td { style: td_style(), "{user.id}" }
                                     td { style: td_style(), "{user.username.clone().unwrap_or_default()}" }
                                     td { style: td_style(), "{user.nick_name.clone().unwrap_or_default()}" }
@@ -214,12 +223,12 @@ pub fn UserManage() -> Element {
                                         style: td_style(),
                                         if user.enable.unwrap_or(true) {
                                             span {
-                                                style: "display: inline-block; padding: 2px 8px; background: #f0f9eb; color: #67c23a; border-radius: 4px; font-size: 12px;",
+                                                style: "display: inline-block; padding: 2px 8px; background: var(--el-color-success-light-9); color: var(--el-color-success); border-radius: 4px; font-size: 12px;",
                                                 "{t(TKey::Enabled)}"
                                             }
                                         } else {
                                             span {
-                                                style: "display: inline-block; padding: 2px 8px; background: #fef0f0; color: #f56c6c; border-radius: 4px; font-size: 12px;",
+                                                style: "display: inline-block; padding: 2px 8px; background: var(--el-color-danger-light-9); color: var(--el-color-danger); border-radius: 4px; font-size: 12px;",
                                                 "{t(TKey::Disabled)}"
                                             }
                                         }
@@ -231,13 +240,16 @@ pub fn UserManage() -> Element {
                                             Button {
                                                 variant: ButtonVariant::Primary,
                                                 size: Some(ButtonSize::Small),
-                                                on_click: move |_| on_delete(user.id),
+                                                on_click: {
+                                                    let u = user.clone();
+                                                    move |_| on_edit(u.clone())
+                                                },
                                                 "{t(TKey::Edit)}"
                                             }
                                             Button {
                                                 variant: ButtonVariant::Danger,
                                                 size: Some(ButtonSize::Small),
-                                                on_click: move |_| on_edit(user.clone()),
+                                                on_click: move |_| on_delete(user.id),
                                                 "{t(TKey::Delete)}"
                                             }
                                         }
@@ -250,9 +262,9 @@ pub fn UserManage() -> Element {
 
                 // 分页
                 div {
-                    style: "display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-top: 1px solid #ebeef5;",
+                    style: "display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-top: 1px solid var(--el-border-color-lighter);",
                     span {
-                        style: "font-size: 14px; color: #909399;",
+                        style: "font-size: 14px; color: var(--el-text-color-secondary);",
                         "{t_paging(total(), current_page(), total_pages)}"
                     }
                     div {
@@ -281,19 +293,38 @@ pub fn UserManage() -> Element {
                 }
             }
 
+            // 删除确认弹窗
+            if let Some(_) = delete_target() {
+                div {
+                    style: "position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--el-overlay-color); z-index: 2000; display: flex; align-items: center; justify-content: center;",
+                    onclick: move |_| { delete_target.set(None); },
+                    div {
+                        style: "background: var(--el-bg-color-overlay); border-radius: 8px; padding: 24px; width: 400px;",
+                        onclick: move |e: MouseEvent| { e.stop_propagation(); },
+                        h3 { style: "font-size: 16px; font-weight: 600; color: var(--el-text-color-primary); margin: 0 0 16px 0;", "{t(TKey::Delete)}" }
+                        p { style: "font-size: 14px; color: var(--el-text-color-regular); margin: 0 0 24px 0;", "{t(TKey::ConfirmDelete)}" }
+                        div {
+                            style: "display: flex; justify-content: flex-end; gap: 12px;",
+                            Button { variant: ButtonVariant::Default, on_click: move |_| { delete_target.set(None); }, "{t(TKey::Cancel)}" }
+                            Button { variant: ButtonVariant::Danger, on_click: confirm_delete, "{t(TKey::Confirm)}" }
+                        }
+                    }
+                }
+            }
+
             // 新增/编辑弹窗
             if dialog_visible() {
                 div {
-                    style: "position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; justify-content: center;",
+                    style: "position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--el-overlay-color); z-index: 2000; display: flex; align-items: center; justify-content: center;",
 
                     div {
-                        style: "background: white; border-radius: 8px; padding: 24px; width: 480px; max-height: 80vh; overflow-y: auto;",
+                        style: "background: var(--el-bg-color-overlay); border-radius: 8px; padding: 24px; width: 480px; max-height: 80vh; overflow-y: auto;",
                         onclick: move |e: MouseEvent| {
                             e.stop_propagation();
                         },
 
                         h3 {
-                            style: "font-size: 18px; font-weight: 600; color: #303030; margin: 0 0 24px 0;",
+                            style: "font-size: 18px; font-weight: 600; color: var(--el-text-color-primary); margin: 0 0 24px 0;",
                             if is_edit() { "{t(TKey::EditUser)}" } else { "{t(TKey::AddUser)}" }
                         }
 
@@ -386,13 +417,13 @@ pub fn UserManage() -> Element {
 }
 
 fn th_style() -> String {
-    "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;".to_string()
+    "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: var(--el-text-color-secondary); background: var(--el-fill-color-lighter); border-bottom: 1px solid var(--el-border-color-lighter);".to_string()
 }
 
 fn td_style() -> String {
-    "padding: 12px 16px; font-size: 14px; color: #606266;".to_string()
+    "padding: 12px 16px; font-size: 14px; color: var(--el-text-color-regular);".to_string()
 }
 
 fn label_style() -> String {
-    "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;".to_string()
+    "display: block; font-size: 14px; color: var(--el-text-color-regular); margin-bottom: 8px;".to_string()
 }

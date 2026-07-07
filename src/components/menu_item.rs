@@ -1,8 +1,8 @@
 use dioxus::prelude::*;
 use dioxus::router::use_route;
 
-use crate::icons::element::*;
-use crate::icons::{IconProps, IconSize};
+use element_icons::element::*;
+use element_icons::{IconProps, IconSize};
 use crate::models::menu::{MenuTreeNode, SysMenu};
 use crate::router::Route;
 
@@ -12,7 +12,7 @@ pub const MENU_CSS: &str = r#"
     display: flex;
     align-items: center;
     padding: 10px 20px;
-    color: #bfcbd9;
+    color: var(--el-sidebar-text);
     cursor: pointer;
     transition: all 0.2s;
     white-space: nowrap;
@@ -21,13 +21,13 @@ pub const MENU_CSS: &str = r#"
     user-select: none;
 }
 .sidebar-menu-item:hover {
-    background: #263445 !important;
-    color: #fff !important;
+    background: var(--el-sidebar-bg-deep) !important;
+    color: var(--el-sidebar-text-active) !important;
 }
 .sidebar-menu-item-active {
-    background: #1f2d3d !important;
-    border-left-color: #409eff !important;
-    color: #fff !important;
+    background: var(--el-sidebar-bg-active) !important;
+    border-left-color: var(--el-color-primary) !important;
+    color: var(--el-sidebar-text-active) !important;
 }
 "#;
 
@@ -41,6 +41,8 @@ fn menu_path_to_route(path: &str) -> Option<Route> {
         "menu" | "menus" => Some(Route::MenuManage {}),
         "api" | "apis" => Some(Route::ApiManage {}),
         "dictionary" | "dictionaries" => Some(Route::DictManage {}),
+        "profile" | "person" => Some(Route::Profile {}),
+        "settings" => Some(Route::Settings {}),
         _ => None,
     }
 }
@@ -283,6 +285,8 @@ fn get_menu_icon_element(menu: &SysMenu) -> Element {
             "menu" | "menus" => Some(Menu as IconComponent),
             "api" | "apis" => Some(Connection as IconComponent),
             "dictionary" | "dictionaries" => Some(Document as IconComponent),
+            "profile" | "person" => Some(Message as IconComponent),
+            "settings" => Some(Setting as IconComponent),
             _ => Some(Document as IconComponent),
         }
     };
@@ -362,7 +366,7 @@ pub fn MenuItem(
                         "{title}"
                     }
                     span {
-                        style: "font-size: 12px; color: #8a9bb0; flex-shrink: 0;",
+                        style: "font-size: 12px; color: var(--el-sidebar-arrow); flex-shrink: 0;",
                         "{arrow}"
                     }
                 }

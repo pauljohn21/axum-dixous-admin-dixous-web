@@ -9,6 +9,7 @@ pub struct R<T> {
 }
 
 /// 分页请求
+#[allow(dead_code)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PageRequest {
     #[serde(skip_serializing_if = "Option::is_none")]

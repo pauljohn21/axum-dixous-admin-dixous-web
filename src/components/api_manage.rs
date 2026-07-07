@@ -73,7 +73,7 @@ pub fn ApiManage() -> Element {
         dialog_visible.set(true);
     };
 
-    let mut on_delete = move |id: i32| {
+    let on_delete = move |id: i32| {
         spawn(async move {
             match api::sys_api::delete_api(id).await {
                 Ok(_) => { fetch_apis(); }
@@ -113,7 +113,7 @@ pub fn ApiManage() -> Element {
         }
     };
 
-    let total_pages = (total() + page_size as u64 - 1) / page_size as u64;
+    let total_pages = total().div_ceil(page_size as u64);
 
     // 预计算表格行数据
     let rows: Vec<ApiRow> = apis().into_iter().map(|item| {
@@ -130,11 +130,14 @@ pub fn ApiManage() -> Element {
         }
     }).collect();
 
+    let th_s = "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: var(--el-text-color-secondary); background: var(--el-fill-color-lighter); border-bottom: 1px solid var(--el-border-color-lighter);";
+    let td_s = "padding: 12px 16px; font-size: 14px; color: var(--el-text-color-regular);";
+
     rsx! {
         div {
             div {
                 style: "display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;",
-                h2 { style: "font-size: 20px; font-weight: 600; color: #303030; margin: 0;", "{t(TKey::ApiManage)}" }
+                h2 { style: "font-size: 20px; font-weight: 600; color: var(--el-text-color-primary); margin: 0;", "{t(TKey::ApiManage)}" }
                 Button { variant: ButtonVariant::Primary, on_click: move |_| {
                     is_edit.set(false);
                     form_path.set(String::new());
@@ -146,11 +149,11 @@ pub fn ApiManage() -> Element {
             }
 
             if let Some(msg) = error_msg() {
-                div { style: "background: #fef0f0; color: #f56c6c; border-radius: 4px; padding: 10px 16px; margin-bottom: 16px; font-size: 14px;", "{msg}" }
+                div { style: "background: var(--el-color-danger-light-9); color: var(--el-color-danger); border-radius: 4px; padding: 10px 16px; margin-bottom: 16px; font-size: 14px;", "{msg}" }
             }
 
             div {
-                style: "display: flex; gap: 12px; margin-bottom: 20px; background: white; padding: 16px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.04);",
+                style: "display: flex; gap: 12px; margin-bottom: 20px; background: var(--el-bg-color); padding: 16px; border-radius: 8px; box-shadow: var(--el-box-shadow-light);",
                 div {
                     style: "flex: 1; max-width: 300px;",
                     Input {
@@ -163,30 +166,30 @@ pub fn ApiManage() -> Element {
             }
 
             div {
-                style: "background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); overflow: hidden;",
+                style: "background: var(--el-bg-color); border-radius: 8px; box-shadow: var(--el-box-shadow-light); overflow: hidden;",
                 table {
                     style: "width: 100%; border-collapse: collapse;",
                     thead {
                         tr {
-                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "ID" }
-                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "{t(TKey::ApiPath)}" }
-                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "{t(TKey::ApiMethod)}" }
-                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "{t(TKey::ApiGroup)}" }
-                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "{t(TKey::ApiDescription)}" }
-                            th { style: "padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 600; color: #909399; background: #fafafa; border-bottom: 1px solid #ebeef5;", "{t(TKey::Action)}" }
+                            th { style: "{th_s}", "ID" }
+                            th { style: "{th_s}", "{t(TKey::ApiPath)}" }
+                            th { style: "{th_s}", "{t(TKey::ApiMethod)}" }
+                            th { style: "{th_s}", "{t(TKey::ApiGroup)}" }
+                            th { style: "{th_s}", "{t(TKey::ApiDescription)}" }
+                            th { style: "{th_s}", "{t(TKey::Action)}" }
                         }
                     }
                     tbody {
                         if loading() {
-                            tr { td { colspan: "6", style: "text-align: center; padding: 40px; color: #909399;", "{t(TKey::Loading)}" } }
+                            tr { td { colspan: "6", style: "text-align: center; padding: 40px; color: var(--el-text-color-secondary);", "{t(TKey::Loading)}" } }
                         } else if rows.is_empty() {
-                            tr { td { colspan: "6", style: "text-align: center; padding: 40px; color: #909399;", "{t(TKey::NoData)}" } }
+                            tr { td { colspan: "6", style: "text-align: center; padding: 40px; color: var(--el-text-color-secondary);", "{t(TKey::NoData)}" } }
                         } else {
                             for row in rows {
                                 tr {
-                                    style: "border-bottom: 1px solid #ebeef5;",
-                                    td { style: "padding: 12px 16px; font-size: 14px; color: #606266;", "{row.id}" }
-                                    td { style: "padding: 12px 16px; font-size: 14px; color: #606266; font-family: monospace;", "{row.path}" }
+                                    style: "border-bottom: 1px solid var(--el-border-color-lighter);",
+                                    td { style: "{td_s}", "{row.id}" }
+                                    td { style: "{td_s} font-family: monospace;", "{row.path}" }
                                     td {
                                         style: "padding: 12px 16px; font-size: 14px;",
                                         span {
@@ -194,8 +197,8 @@ pub fn ApiManage() -> Element {
                                             "{row.method}"
                                         }
                                     }
-                                    td { style: "padding: 12px 16px; font-size: 14px; color: #606266;", "{row.group}" }
-                                    td { style: "padding: 12px 16px; font-size: 14px; color: #606266;", "{row.description}" }
+                                    td { style: "{td_s}", "{row.group}" }
+                                    td { style: "{td_s}", "{row.description}" }
                                     td {
                                         style: "padding: 12px 16px;",
                                         div {
@@ -221,8 +224,8 @@ pub fn ApiManage() -> Element {
                 }
 
                 div {
-                    style: "display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-top: 1px solid #ebeef5;",
-                    span { style: "font-size: 14px; color: #909399;", "{t_paging(total(), current_page(), total_pages)}" }
+                    style: "display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-top: 1px solid var(--el-border-color-lighter);",
+                    span { style: "font-size: 14px; color: var(--el-text-color-secondary);", "{t_paging(total(), current_page(), total_pages)}" }
                     div {
                         style: "display: flex; gap: 8px;",
                         Button { variant: ButtonVariant::Default, size: Some(ButtonSize::Small), disabled: current_page() <= 1, on_click: move |_| { current_page.set(current_page() - 1); fetch_apis(); }, "{t(TKey::PrevPage)}" }
@@ -233,30 +236,30 @@ pub fn ApiManage() -> Element {
 
             if dialog_visible() {
                 div {
-                    style: "position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; justify-content: center;",
+                    style: "position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--el-overlay-color); z-index: 2000; display: flex; align-items: center; justify-content: center;",
                     onclick: move |_| { dialog_visible.set(false); },
                     div {
-                        style: "background: white; border-radius: 8px; padding: 24px; width: 480px;",
+                        style: "background: var(--el-bg-color-overlay); border-radius: 8px; padding: 24px; width: 480px;",
                         onclick: move |e: MouseEvent| { e.stop_propagation(); },
-                        h3 { style: "font-size: 18px; font-weight: 600; color: #303030; margin: 0 0 24px 0;", if is_edit() { "{t(TKey::EditApi)}" } else { "{t(TKey::AddApi)}" } }
+                        h3 { style: "font-size: 18px; font-weight: 600; color: var(--el-text-color-primary); margin: 0 0 24px 0;", if is_edit() { "{t(TKey::EditApi)}" } else { "{t(TKey::AddApi)}" } }
                         div {
                             style: "margin-bottom: 16px;",
-                            label { style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;", "{t(TKey::ApiPath)} *" }
+                            label { style: "display: block; font-size: 14px; color: var(--el-text-color-regular); margin-bottom: 8px;", "{t(TKey::ApiPath)} *" }
                             Input { value: Some(form_path()), placeholder: Some(t(TKey::ApiPathPlaceholder)), on_change: move |e: Event<FormData>| { form_path.set(e.data().value()); } }
                         }
                         div {
                             style: "margin-bottom: 16px;",
-                            label { style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;", "{t(TKey::ApiMethod)} *" }
+                            label { style: "display: block; font-size: 14px; color: var(--el-text-color-regular); margin-bottom: 8px;", "{t(TKey::ApiMethod)} *" }
                             Input { value: Some(form_method()), placeholder: Some(t(TKey::ApiMethodPlaceholder)), on_change: move |e: Event<FormData>| { form_method.set(e.data().value()); } }
                         }
                         div {
                             style: "margin-bottom: 16px;",
-                            label { style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;", "{t(TKey::ApiGroup)}" }
+                            label { style: "display: block; font-size: 14px; color: var(--el-text-color-regular); margin-bottom: 8px;", "{t(TKey::ApiGroup)}" }
                             Input { value: Some(form_group()), placeholder: Some(t(TKey::ApiGroupPlaceholder)), on_change: move |e: Event<FormData>| { form_group.set(e.data().value()); } }
                         }
                         div {
                             style: "margin-bottom: 24px;",
-                            label { style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;", "{t(TKey::ApiDescription)}" }
+                            label { style: "display: block; font-size: 14px; color: var(--el-text-color-regular); margin-bottom: 8px;", "{t(TKey::ApiDescription)}" }
                             Input { value: Some(form_description()), placeholder: Some(t(TKey::ApiDescPlaceholder)), on_change: move |e: Event<FormData>| { form_description.set(e.data().value()); } }
                         }
                         div {

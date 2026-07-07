@@ -28,6 +28,7 @@ pub fn remove(key: &str) {
 }
 
 /// 清空 localStorage
+#[allow(dead_code)]
 pub fn clear() {
     if let Some(storage) = local_storage() {
         let _ = storage.clear();
@@ -54,6 +55,7 @@ pub fn clear_token() {
 // ===== Username 便捷方法 =====
 
 /// 获取当前用户名
+#[allow(dead_code)]
 pub fn get_username() -> Option<String> {
     get(USERNAME_KEY)
 }
@@ -64,6 +66,7 @@ pub fn set_username(username: &str) {
 }
 
 /// 清除用户名
+#[allow(dead_code)]
 pub fn clear_username() {
     remove(USERNAME_KEY);
 }

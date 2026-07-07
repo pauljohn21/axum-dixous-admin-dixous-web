@@ -1,30 +1,46 @@
 use dioxus::prelude::*;
 use dioxus_element_plug::prelude::*;
 
+use crate::api;
 use crate::i18n::{t, TKey};
 
 /// 仪表盘页面
 #[component]
 pub fn Dashboard() -> Element {
+    let mut stats = use_signal(|| api::user::DashboardStats {
+        user_count: 0,
+        role_count: 0,
+        menu_count: 0,
+        api_count: 0,
+    });
+
+    use_effect(move || {
+        spawn(async move {
+            if let Ok(s) = api::user::dashboard_stats().await {
+                stats.set(s);
+            }
+        });
+    });
+
+    let card_style = "background: var(--el-bg-color); border-radius: 8px; padding: 24px; box-shadow: var(--el-box-shadow-lighter);";
+
     rsx! {
         div {
             style: "width: 100%;",
 
             // 欢迎卡片
-                        Card {
+            Card {
                 class: "mb-6",
                 header: Some(t(TKey::Welcome)),
-                
-
 
                 div {
                     style: "padding: 20px 0;",
                     h2 {
-                        style: "font-size: 24px; color: #303030; margin: 0 0 8px 0;",
+                        style: "font-size: 24px; color: var(--el-text-color-primary); margin: 0 0 8px 0;",
                         "{t(TKey::WelcomeMessage)}"
                     }
                     p {
-                        style: "font-size: 14px; color: #909399; margin: 0;",
+                        style: "font-size: 14px; color: var(--el-text-color-secondary); margin: 0;",
                         "{t(TKey::WelcomeDescription)}"
                     }
                 }
@@ -36,15 +52,15 @@ pub fn Dashboard() -> Element {
 
                 // 用户数
                 div {
-                    style: "background: white; border-radius: 8px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);",
+                    style: "{card_style}",
                     div {
                         style: "display: flex; align-items: center; justify-content: space-between;",
                         div {
-                            p { style: "font-size: 14px; color: #909399; margin: 0 0 8px 0;", "{t(TKey::TotalUsers)}" }
-                            p { style: "font-size: 28px; font-weight: 700; color: #409eff; margin: 0;", "128" }
+                            p { style: "font-size: 14px; color: var(--el-text-color-secondary); margin: 0 0 8px 0;", "{t(TKey::TotalUsers)}" }
+                            p { style: "font-size: 28px; font-weight: 700; color: var(--el-color-primary); margin: 0;", "{stats().user_count}" }
                         }
                         div {
-                            style: "width: 48px; height: 48px; background: #ecf5ff; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px;",
+                            style: "width: 48px; height: 48px; background: var(--el-color-primary-light-9); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px;",
                             "👤"
                         }
                     }
@@ -52,15 +68,15 @@ pub fn Dashboard() -> Element {
 
                 // 角色数
                 div {
-                    style: "background: white; border-radius: 8px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);",
+                    style: "{card_style}",
                     div {
                         style: "display: flex; align-items: center; justify-content: space-between;",
                         div {
-                            p { style: "font-size: 14px; color: #909399; margin: 0 0 8px 0;", "{t(TKey::TotalRoles)}" }
-                            p { style: "font-size: 28px; font-weight: 700; color: #67c23a; margin: 0;", "8" }
+                            p { style: "font-size: 14px; color: var(--el-text-color-secondary); margin: 0 0 8px 0;", "{t(TKey::TotalRoles)}" }
+                            p { style: "font-size: 28px; font-weight: 700; color: var(--el-color-success); margin: 0;", "{stats().role_count}" }
                         }
                         div {
-                            style: "width: 48px; height: 48px; background: #f0f9eb; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px;",
+                            style: "width: 48px; height: 48px; background: var(--el-color-success-light-9); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px;",
                             "👥"
                         }
                     }
@@ -68,15 +84,15 @@ pub fn Dashboard() -> Element {
 
                 // 菜单数
                 div {
-                    style: "background: white; border-radius: 8px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);",
+                    style: "{card_style}",
                     div {
                         style: "display: flex; align-items: center; justify-content: space-between;",
                         div {
-                            p { style: "font-size: 14px; color: #909399; margin: 0 0 8px 0;", "{t(TKey::TotalMenus)}" }
-                            p { style: "font-size: 28px; font-weight: 700; color: #e6a23c; margin: 0;", "32" }
+                            p { style: "font-size: 14px; color: var(--el-text-color-secondary); margin: 0 0 8px 0;", "{t(TKey::TotalMenus)}" }
+                            p { style: "font-size: 28px; font-weight: 700; color: var(--el-color-warning); margin: 0;", "{stats().menu_count}" }
                         }
                         div {
-                            style: "width: 48px; height: 48px; background: #fdf6ec; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px;",
+                            style: "width: 48px; height: 48px; background: var(--el-color-warning-light-9); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px;",
                             "📋"
                         }
                     }
@@ -84,15 +100,15 @@ pub fn Dashboard() -> Element {
 
                 // API数
                 div {
-                    style: "background: white; border-radius: 8px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);",
+                    style: "{card_style}",
                     div {
                         style: "display: flex; align-items: center; justify-content: space-between;",
                         div {
-                            p { style: "font-size: 14px; color: #909399; margin: 0 0 8px 0;", "{t(TKey::TotalApis)}" }
-                            p { style: "font-size: 28px; font-weight: 700; color: #f56c6c; margin: 0;", "56" }
+                            p { style: "font-size: 14px; color: var(--el-text-color-secondary); margin: 0 0 8px 0;", "{t(TKey::TotalApis)}" }
+                            p { style: "font-size: 28px; font-weight: 700; color: var(--el-color-danger); margin: 0;", "{stats().api_count}" }
                         }
                         div {
-                            style: "width: 48px; height: 48px; background: #fef0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px;",
+                            style: "width: 48px; height: 48px; background: var(--el-color-danger-light-9); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px;",
                             "🔌"
                         }
                     }
@@ -100,46 +116,44 @@ pub fn Dashboard() -> Element {
             }
 
             // 系统信息
-                        Card {
+            Card {
                 header: Some(t(TKey::SystemInfo)),
-                
-
 
                 div {
                     style: "padding: 12px 0;",
 
                     div {
-                        style: "display: flex; padding: 12px 0; border-bottom: 1px solid #ebeef5;",
-                        span { style: "width: 160px; color: #909399; font-size: 14px;", "{t(TKey::BackendFramework)}" }
-                        span { style: "color: #303030; font-size: 14px;", "Axum 0.8 (Rust)" }
+                        style: "display: flex; padding: 12px 0; border-bottom: 1px solid var(--el-border-color-lighter);",
+                        span { style: "width: 160px; color: var(--el-text-color-secondary); font-size: 14px;", "{t(TKey::BackendFramework)}" }
+                        span { style: "color: var(--el-text-color-primary); font-size: 14px;", "Axum 0.8 (Rust)" }
                     }
                     div {
-                        style: "display: flex; padding: 12px 0; border-bottom: 1px solid #ebeef5;",
-                        span { style: "width: 160px; color: #909399; font-size: 14px;", "{t(TKey::FrontendFramework)}" }
-                        span { style: "color: #303030; font-size: 14px;", "Dioxus 0.7 (Rust/WASM)" }
+                        style: "display: flex; padding: 12px 0; border-bottom: 1px solid var(--el-border-color-lighter);",
+                        span { style: "width: 160px; color: var(--el-text-color-secondary); font-size: 14px;", "{t(TKey::FrontendFramework)}" }
+                        span { style: "color: var(--el-text-color-primary); font-size: 14px;", "Dioxus 0.7 (Rust/WASM)" }
                     }
                     div {
-                        style: "display: flex; padding: 12px 0; border-bottom: 1px solid #ebeef5;",
-                        span { style: "width: 160px; color: #909399; font-size: 14px;", "{t(TKey::UiLibrary)}" }
-                        span { style: "color: #303030; font-size: 14px;", "Element Plus (dioxus-element-plug)" }
+                        style: "display: flex; padding: 12px 0; border-bottom: 1px solid var(--el-border-color-lighter);",
+                        span { style: "width: 160px; color: var(--el-text-color-secondary); font-size: 14px;", "{t(TKey::UiLibrary)}" }
+                        span { style: "color: var(--el-text-color-primary); font-size: 14px;", "Element Plus (dioxus-element-plug)" }
                     }
                     div {
-                        style: "display: flex; padding: 12px 0; border-bottom: 1px solid #ebeef5;",
-                        span { style: "width: 160px; color: #909399; font-size: 14px;", "{t(TKey::Database)}" }
-                        span { style: "color: #303030; font-size: 14px;", "MySQL (SeaORM)" }
+                        style: "display: flex; padding: 12px 0; border-bottom: 1px solid var(--el-border-color-lighter);",
+                        span { style: "width: 160px; color: var(--el-text-color-secondary); font-size: 14px;", "{t(TKey::Database)}" }
+                        span { style: "color: var(--el-text-color-primary); font-size: 14px;", "MySQL (SeaORM)" }
                     }
                     div {
-                        style: "display: flex; padding: 12px 0; border-bottom: 1px solid #ebeef5;",
-                        span { style: "width: 160px; color: #909399; font-size: 14px;", "{t(TKey::AuthFramework)}" }
-                        span { style: "color: #303030; font-size: 14px;", "Casbin RBAC" }
+                        style: "display: flex; padding: 12px 0; border-bottom: 1px solid var(--el-border-color-lighter);",
+                        span { style: "width: 160px; color: var(--el-text-color-secondary); font-size: 14px;", "{t(TKey::AuthFramework)}" }
+                        span { style: "color: var(--el-text-color-primary); font-size: 14px;", "Casbin RBAC" }
                     }
                     div {
                         style: "display: flex; padding: 12px 0;",
-                        span { style: "width: 160px; color: #909399; font-size: 14px;", "{t(TKey::ApiDocs)}" }
+                        span { style: "width: 160px; color: var(--el-text-color-secondary); font-size: 14px;", "{t(TKey::ApiDocs)}" }
                         a {
                             href: "http://localhost:8888",
                             target: "_blank",
-                            style: "color: #409eff; font-size: 14px; text-decoration: none;",
+                            style: "color: var(--el-color-primary); font-size: 14px; text-decoration: none;",
                             "Swagger UI"
                         }
                     }

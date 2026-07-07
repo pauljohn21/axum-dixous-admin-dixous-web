@@ -1,45 +1,37 @@
 use serde::{Deserialize, Serialize};
 
+/// 角色 (与后端 sys_role::Model 对应)
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct SysRole {
     pub id: i32,
     #[serde(default)]
-    pub name: Option<String>,
+    pub en_name: Option<String>,
     #[serde(default)]
-    pub keyword: Option<String>,
+    pub cn_name: Option<String>,
     #[serde(default)]
-    pub desc: Option<String>,
+    pub parent_id: Option<u64>,
     #[serde(default)]
-    pub sort: Option<i32>,
+    pub created_ad: Option<String>,
     #[serde(default)]
-    pub status: Option<bool>,
-    #[serde(default)]
-    pub created_at: Option<String>,
+    pub updated_ad: Option<String>,
 }
 
+/// 新增角色 DTO (与后端 SysRoleInsertDTO 对应)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SysRoleInsertDTO {
-    pub name: String,
+    pub en_name: String,
+    pub cn_name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub keyword: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub desc: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub sort: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub status: Option<bool>,
+    pub parent_id: Option<u64>,
 }
 
+/// 更新角色 DTO (与后端 SysRoleUpdateDTO 对应)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SysRoleUpdateDTO {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>,
+    pub en_name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub keyword: Option<String>,
+    pub cn_name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub desc: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub sort: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub status: Option<bool>,
+    pub parent_id: Option<u64>,
 }

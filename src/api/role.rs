@@ -1,4 +1,4 @@
-use crate::http::{build_page_query, delete, get_with_query, post, put};
+use crate::http::{build_page_query, delete_void, get_with_query, post_void, put};
 use crate::models::common::PageResponse;
 use crate::models::role::{SysRole, SysRoleInsertDTO, SysRoleUpdateDTO};
 
@@ -12,7 +12,7 @@ pub async fn list(
 }
 
 pub async fn create(data: SysRoleInsertDTO) -> Result<(), String> {
-    post("/api/role", &data).await
+    post_void("/api/role", &data).await
 }
 
 pub async fn update(id: i32, data: SysRoleUpdateDTO) -> Result<SysRole, String> {
@@ -20,5 +20,5 @@ pub async fn update(id: i32, data: SysRoleUpdateDTO) -> Result<SysRole, String> 
 }
 
 pub async fn delete_role(id: i32) -> Result<(), String> {
-    delete(&format!("/api/role/{}", id)).await
+    delete_void(&format!("/api/role/{}", id)).await
 }

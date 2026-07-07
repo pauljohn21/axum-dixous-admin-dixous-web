@@ -71,11 +71,14 @@ pub fn set_locale(locale: Locale) {
 }
 
 /// 翻译 key 枚举
+#[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TKey {
     // 通用
     Search, Cancel, Confirm, Edit, Delete, Loading, NoData,
     Enabled, Disabled, PrevPage, NextPage, TotalRecords, BackHome, PageNotFound,
+    ConfirmDelete, ChangePassword, OldPassword, NewPassword, ConfirmPassword,
+    PasswordMismatch, PasswordChanged,
     // 登录页
     AdminSystem, Username, Password, UsernamePlaceholder, PasswordPlaceholder,
     UsernamePasswordRequired, Login, LoggingIn,
@@ -90,6 +93,7 @@ pub enum TKey {
     // 角色管理
     RoleManage, AddRole, EditRole, RoleName, RoleKeyword, RoleDesc,
     SearchRolePlaceholder, RoleNamePlaceholder, RoleKeywordPlaceholder, RoleDescPlaceholder,
+    RoleEnName, RoleCnName, RoleEnNamePlaceholder, RoleCnNamePlaceholder,
     // API管理
     ApiManage, AddApi, EditApi, ApiPath, ApiMethod, ApiGroup, ApiDescription,
     SearchApiPlaceholder, ApiPathPlaceholder, ApiMethodPlaceholder, ApiGroupPlaceholder, ApiDescPlaceholder,
@@ -101,6 +105,7 @@ pub enum TKey {
     SearchDictPlaceholder, DictNamePlaceholder, DictCodePlaceholder, DictDescPlaceholder, DescPlaceholder, Description,
     // 个人信息和设置
     Profile, Settings, BasicInfo, Avatar, Guest, SystemSettings, Language, Theme, ComingSoon,
+    ThemeMode, LightMode, DarkMode, ThemeColor, PrimaryColor, SuccessColor, WarningColor, DangerColor,
 }
 
 /// 翻译函数（响应式 — 渲染期调用会订阅 locale Signal）
@@ -127,6 +132,9 @@ fn t_zh(key: TKey) -> String {
         TKey::PrevPage => "上一页", TKey::NextPage => "下一页",
         TKey::TotalRecords => "共 {total} 条记录，第 {current}/{total_pages} 页",
         TKey::BackHome => "返回首页", TKey::PageNotFound => "页面未找到",
+        TKey::ConfirmDelete => "确定删除吗？此操作不可撤销。", TKey::ChangePassword => "修改密码",
+        TKey::OldPassword => "原密码", TKey::NewPassword => "新密码", TKey::ConfirmPassword => "确认密码",
+        TKey::PasswordMismatch => "两次密码不一致", TKey::PasswordChanged => "密码修改成功",
         TKey::AdminSystem => "后台管理系统", TKey::Username => "用户名", TKey::Password => "密码",
         TKey::UsernamePlaceholder => "请输入用户名", TKey::PasswordPlaceholder => "请输入密码",
         TKey::UsernamePasswordRequired => "用户名和密码不能为空", TKey::Login => "登 录", TKey::LoggingIn => "登录中...",
@@ -145,6 +153,8 @@ fn t_zh(key: TKey) -> String {
         TKey::RoleName => "角色名称", TKey::RoleKeyword => "关键词", TKey::RoleDesc => "描述",
         TKey::SearchRolePlaceholder => "搜索角色名称", TKey::RoleNamePlaceholder => "请输入角色名称",
         TKey::RoleKeywordPlaceholder => "请输入角色关键词", TKey::RoleDescPlaceholder => "请输入角色描述",
+        TKey::RoleEnName => "英文名", TKey::RoleCnName => "中文名",
+        TKey::RoleEnNamePlaceholder => "请输入英文名", TKey::RoleCnNamePlaceholder => "请输入中文名",
         TKey::ApiManage => "API管理", TKey::AddApi => "+ 新增API", TKey::EditApi => "编辑API",
         TKey::ApiPath => "路径", TKey::ApiMethod => "方法", TKey::ApiGroup => "分组", TKey::ApiDescription => "描述",
         TKey::SearchApiPlaceholder => "搜索API路径/描述", TKey::ApiPathPlaceholder => "如 /api/user/list",
@@ -163,6 +173,9 @@ fn t_zh(key: TKey) -> String {
         TKey::Profile => "个人信息", TKey::Settings => "系统配置", TKey::BasicInfo => "基本信息",
         TKey::Avatar => "头像", TKey::Guest => "访客", TKey::SystemSettings => "系统设置",
         TKey::Language => "语言", TKey::Theme => "主题", TKey::ComingSoon => "即将推出",
+        TKey::ThemeMode => "主题模式", TKey::LightMode => "亮色", TKey::DarkMode => "暗色",
+        TKey::ThemeColor => "主题色", TKey::PrimaryColor => "主色", TKey::SuccessColor => "成功色",
+        TKey::WarningColor => "警告色", TKey::DangerColor => "危险色",
     }.into()
 }
 
@@ -174,6 +187,9 @@ fn t_en(key: TKey) -> String {
         TKey::PrevPage => "Previous", TKey::NextPage => "Next",
         TKey::TotalRecords => "Total {total} records, Page {current}/{total_pages}",
         TKey::BackHome => "Back Home", TKey::PageNotFound => "Page Not Found",
+        TKey::ConfirmDelete => "Are you sure? This action cannot be undone.", TKey::ChangePassword => "Change Password",
+        TKey::OldPassword => "Current Password", TKey::NewPassword => "New Password", TKey::ConfirmPassword => "Confirm Password",
+        TKey::PasswordMismatch => "Passwords do not match", TKey::PasswordChanged => "Password changed successfully",
         TKey::AdminSystem => "Admin System", TKey::Username => "Username", TKey::Password => "Password",
         TKey::UsernamePlaceholder => "Enter username", TKey::PasswordPlaceholder => "Enter password",
         TKey::UsernamePasswordRequired => "Username and password cannot be empty", TKey::Login => "Login", TKey::LoggingIn => "Logging in...",
@@ -192,6 +208,8 @@ fn t_en(key: TKey) -> String {
         TKey::RoleName => "Role Name", TKey::RoleKeyword => "Keyword", TKey::RoleDesc => "Description",
         TKey::SearchRolePlaceholder => "Search role name", TKey::RoleNamePlaceholder => "Enter role name",
         TKey::RoleKeywordPlaceholder => "Enter role keyword", TKey::RoleDescPlaceholder => "Enter role description",
+        TKey::RoleEnName => "English Name", TKey::RoleCnName => "Chinese Name",
+        TKey::RoleEnNamePlaceholder => "Enter English name", TKey::RoleCnNamePlaceholder => "Enter Chinese name",
         TKey::ApiManage => "API Management", TKey::AddApi => "+ Add API", TKey::EditApi => "Edit API",
         TKey::ApiPath => "Path", TKey::ApiMethod => "Method", TKey::ApiGroup => "Group", TKey::ApiDescription => "Description",
         TKey::SearchApiPlaceholder => "Search API path/description", TKey::ApiPathPlaceholder => "e.g. /api/user/list",
@@ -210,5 +228,8 @@ fn t_en(key: TKey) -> String {
         TKey::Profile => "Profile", TKey::Settings => "Settings", TKey::BasicInfo => "Basic Info",
         TKey::Avatar => "Avatar", TKey::Guest => "Guest", TKey::SystemSettings => "System Settings",
         TKey::Language => "Language", TKey::Theme => "Theme", TKey::ComingSoon => "Coming Soon",
+        TKey::ThemeMode => "Theme Mode", TKey::LightMode => "Light", TKey::DarkMode => "Dark",
+        TKey::ThemeColor => "Theme Color", TKey::PrimaryColor => "Primary", TKey::SuccessColor => "Success",
+        TKey::WarningColor => "Warning", TKey::DangerColor => "Danger",
     }.into()
 }

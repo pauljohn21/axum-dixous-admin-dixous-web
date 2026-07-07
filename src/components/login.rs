@@ -10,7 +10,7 @@ use crate::storage;
 #[component]
 pub fn Login() -> Element {
     let mut username = use_signal(|| "admin".to_string());
-    let mut password = use_signal(|| String::new());
+    let mut password = use_signal(String::new);
     let mut error_msg = use_signal(|| None::<String>);
     let mut loading = use_signal(|| false);
     let navigator = navigator();
@@ -47,17 +47,17 @@ pub fn Login() -> Element {
             style: "min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);",
 
             div {
-                style: "background: white; border-radius: 12px; padding: 40px; width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);",
+                style: "background: var(--el-bg-color); border-radius: 12px; padding: 40px; width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);",
 
                 // Logo
                 div {
                     style: "text-align: center; margin-bottom: 30px;",
                     h1 {
-                        style: "font-size: 28px; font-weight: 700; color: #303030; margin: 0 0 8px 0;",
+                        style: "font-size: 28px; font-weight: 700; color: var(--el-text-color-primary); margin: 0 0 8px 0;",
                         "Axum Admin"
                     }
                     p {
-                        style: "font-size: 14px; color: #909399; margin: 0;",
+                        style: "font-size: 14px; color: var(--el-text-color-secondary); margin: 0;",
                         "{t(TKey::AdminSystem)}"
                     }
                 }
@@ -65,7 +65,7 @@ pub fn Login() -> Element {
                 // 错误提示
                 if let Some(msg) = error_msg() {
                     div {
-                        style: "background: #fef0f0; color: #f56c6c; border: 1px solid #fde2e2; border-radius: 4px; padding: 10px 16px; margin-bottom: 20px; font-size: 14px;",
+                        style: "background: var(--el-color-danger-light-9); color: var(--el-color-danger); border: 1px solid var(--el-color-danger-light-7); border-radius: 4px; padding: 10px 16px; margin-bottom: 20px; font-size: 14px;",
                         "{msg}"
                     }
                 }
@@ -74,7 +74,7 @@ pub fn Login() -> Element {
                     div {
                         style: "margin-bottom: 20px;",
                         label {
-                            style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;",
+                            style: "display: block; font-size: 14px; color: var(--el-text-color-regular); margin-bottom: 8px;",
                             "{t(TKey::Username)}"
                         }
                         Input {
@@ -91,7 +91,7 @@ pub fn Login() -> Element {
                     div {
                         style: "margin-bottom: 24px;",
                         label {
-                            style: "display: block; font-size: 14px; color: #606266; margin-bottom: 8px;",
+                            style: "display: block; font-size: 14px; color: var(--el-text-color-regular); margin-bottom: 8px;",
                             "{t(TKey::Password)}"
                         }
                         Input {
@@ -117,10 +117,10 @@ pub fn Login() -> Element {
 
                 // 底部信息 + 语言切换
                 div {
-                    style: "text-align: center; margin-top: 24px; font-size: 12px; color: #c0c4cc; display: flex; flex-direction: column; align-items: center; gap: 12px;",
+                    style: "text-align: center; margin-top: 24px; font-size: 12px; color: var(--el-text-color-placeholder); display: flex; flex-direction: column; align-items: center; gap: 12px;",
                     "Powered by Axum + Dioxus"
                     button {
-                        style: "padding: 4px 12px; font-size: 12px; border: 1px solid #dcdfe6; border-radius: 4px; cursor: pointer; background: transparent; color: #909399;",
+                        style: "padding: 4px 12px; font-size: 12px; border: 1px solid var(--el-border-color); border-radius: 4px; cursor: pointer; background: transparent; color: var(--el-text-color-secondary);",
                         onclick: move |_| {
                             let cur = current_locale();
                             set_locale(match cur {

@@ -1,20 +1,20 @@
 use dioxus::prelude::*;
-use dioxus_element_plug::prelude::*;
 
 use crate::api;
 use crate::components::menu_item::{MenuItem, MENU_CSS};
 use crate::components::user_dropdown::UserDropdown;
-use crate::i18n::{current_locale, set_locale, t, Locale, TKey};
+use crate::i18n::{current_locale, set_locale, Locale};
 use crate::models::menu::{build_menu_tree, MenuTreeNode};
 use crate::router::Route;
 use crate::storage;
+use crate::theme::{current_theme, toggle_theme, ThemeMode};
 
 /// 管理后台布局 - 侧边栏 + 头部 + 内容区
 #[component]
 pub fn AdminLayout() -> Element {
-    let mut username = use_signal(|| String::new());
+    let mut username = use_signal(String::new);
     let mut sidebar_collapsed = use_signal(|| false);
-    let mut expanded_keys: Signal<Vec<i32>> = use_signal(|| vec![]);
+    let mut expanded_keys: Signal<Vec<i32>> = use_signal(std::vec::Vec::new);
     let navigator = navigator();
 
     // 获取用户信息（含菜单）
@@ -23,13 +23,6 @@ pub fn AdminLayout() -> Element {
             api::auth::get_user_info().await.ok()
         } else {
             None
-        }
-    });
-
-    // 如果没有token，跳转登录
-    use_effect(move || {
-        if storage::get_token().is_none() {
-            navigator.replace(Route::Login {});
         }
     });
 
@@ -49,8 +42,13 @@ pub fn AdminLayout() -> Element {
     });
 
     let do_logout = move |_| {
-        storage::clear_token();
-        navigator.replace(Route::Login {});
+        spawn(async move {
+            // 通知后端将 token 加入黑名单
+            let _ = api::auth::logout().await;
+            // 清除前端 token
+            storage::clear_token();
+            navigator.replace(Route::Login {});
+        });
     };
 
     let toggle_sidebar = move |_| {
@@ -58,6 +56,7 @@ pub fn AdminLayout() -> Element {
     };
 
     let sidebar_width = if sidebar_collapsed() { "64px" } else { "220px" };
+    let theme = current_theme();
 
     // 构建菜单树
     let menu_tree: Vec<MenuTreeNode> = (user_info)()
@@ -70,19 +69,19 @@ pub fn AdminLayout() -> Element {
         style { "{MENU_CSS}" }
 
         div {
-            style: "display: flex; min-height: 100vh; background: #f0f2f5;",
+            style: "display: flex; min-height: 100vh; background: var(--el-bg-color-page);",
 
             // 侧边栏
             div {
-                style: "width: {sidebar_width}; background: #304156; transition: width 0.3s; position: fixed; top: 0; left: 0; bottom: 0; z-index: 1001; overflow-y: auto;",
+                style: "width: {sidebar_width}; background: var(--el-sidebar-bg); transition: width var(--el-transition-duration); position: fixed; top: 0; left: 0; bottom: 0; z-index: 1001; overflow-y: auto;",
 
                 // Logo
                 div {
-                    style: "height: 60px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #3d4b5c;",
+                    style: "height: 60px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--el-sidebar-bg-deep);",
                     if sidebar_collapsed() {
-                        span { style: "font-size: 20px; color: #409eff; font-weight: bold;", "A" }
+                        span { style: "font-size: 20px; color: var(--el-color-primary); font-weight: bold;", "A" }
                     } else {
-                        span { style: "font-size: 18px; color: #409eff; font-weight: bold; white-space: nowrap;", "Axum Admin" }
+                        span { style: "font-size: 18px; color: var(--el-color-primary); font-weight: bold; white-space: nowrap;", "Axum Admin" }
                     }
                 }
 
@@ -104,16 +103,16 @@ pub fn AdminLayout() -> Element {
 
             // 主内容区
             div {
-                style: "flex: 1; margin-left: {sidebar_width}; transition: margin-left 0.3s; display: flex; flex-direction: column; min-height: 100vh;",
+                style: "flex: 1; margin-left: {sidebar_width}; transition: margin-left var(--el-transition-duration); display: flex; flex-direction: column; min-height: 100vh;",
 
                 // 头部
                 div {
-                    style: "height: 60px; background: white; box-shadow: 0 1px 4px rgba(0,21,41,0.08); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 1000;",
+                    style: "height: 60px; background: var(--el-header-bg); box-shadow: var(--el-header-shadow); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 1000;",
 
                     div {
                         style: "display: flex; align-items: center; gap: 16px;",
                         div {
-                            style: "cursor: pointer; font-size: 20px; color: #5a5e66;",
+                            style: "cursor: pointer; font-size: 20px; color: var(--el-header-text);",
                             onclick: toggle_sidebar,
                             if sidebar_collapsed() { "☰" } else { "✕" }
                         }
@@ -122,11 +121,21 @@ pub fn AdminLayout() -> Element {
                     div {
                         style: "display: flex; align-items: center; gap: 16px;",
 
+                        // 主题切换
+                        div {
+                            style: "display: flex; align-items: center;",
+                            button {
+                                style: "padding: 6px 10px; font-size: 16px; border: 1px solid var(--el-border-color); border-radius: 4px; cursor: pointer; background: transparent; color: var(--el-header-text); transition: all 0.2s;",
+                                onclick: move |_| toggle_theme(),
+                                if theme == ThemeMode::Dark { "☀" } else { "🌙" }
+                            }
+                        }
+
                         // 语言切换
                         div {
                             style: "display: flex; align-items: center; gap: 4px;",
                             button {
-                                style: "padding: 4px 8px; font-size: 12px; border: 1px solid #dcdfe6; border-radius: 4px; cursor: pointer; background: transparent; color: #606266;",
+                                style: "padding: 4px 8px; font-size: 12px; border: 1px solid var(--el-border-color); border-radius: 4px; cursor: pointer; background: transparent; color: var(--el-text-color-regular);",
                                 onclick: move |_| {
                                     let cur = current_locale();
                                     set_locale(match cur {

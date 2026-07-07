@@ -2,13 +2,14 @@
 name = "web"
 version = "0.1.0"
 authors = ["pauljohn21 <819820211@qq.com>"]
-edition = "2021"
+edition = "2024"
+rust-version = "1.96"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 dioxus = { version = "0.7.1", features = ["router"] }
-dioxus-element-plug = "0.2.0"
+dioxus-element-plug = "0.2.2"
 route-guard = { path = "crates/route-guard" }
 element-icons = { path = "crates/element-icons" }
 dioxus-i18n = { path = "crates/dioxus-i18n" }

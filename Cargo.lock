@@ -1125,9 +1125,9 @@ dependencies = [
 
 [[package]]
 name = "dioxus-element-plug"
-version = "0.2.0"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "481b7f6a6b03d896549889b32783993c1228605540a87df35bd5ef4197deccbc"
+checksum = "cadc1187bc75c6cc2b36545fb23af9907e9f657b55bfb5851e881719b6a221b3"
 dependencies = [
  "dioxus",
  "serde_json",

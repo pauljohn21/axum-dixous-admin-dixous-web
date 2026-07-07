@@ -1,4 +1,4 @@
-use crate::http::{build_page_query, delete_void, get, get_with_query, post_void, put};
+use crate::http::{build_page_query, delete_void, get, get_with_query, post_void, put, put_void};
 use crate::models::common::PageResponse;
 use crate::models::user::{SysUser, SysUserInsertDTO, SysUserUpdateDTO};
 use serde::{Deserialize, Serialize};
@@ -38,7 +38,7 @@ pub struct ChangePasswordDTO {
 
 pub async fn change_password(old_password: String, new_password: String) -> Result<(), String> {
     let dto = ChangePasswordDTO { old_password, new_password };
-    post_void("/api/user/change_password", &dto).await
+    put_void("/api/user/change_password", &dto).await
 }
 
 /// 仪表盘统计数据

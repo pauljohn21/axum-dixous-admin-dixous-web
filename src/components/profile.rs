@@ -3,39 +3,28 @@ use dioxus_element_plug::prelude::*;
 
 use crate::api;
 use crate::i18n::{t, TKey};
-use crate::models::user::SysUser;
 
 /// 个人信息页面
 #[component]
 pub fn Profile() -> Element {
-    let mut user = use_signal(|| SysUser {
-        id: 0,
-        username: None,
-        nick_name: None,
-        phone: None,
-        email: None,
-        header_img: None,
-        side_mode: None,
-        enable: None,
-        created_at: None,
-    });
+    let mut nick_name = use_signal(|| None::<String>);
+    let mut phone = use_signal(|| None::<String>);
+    let mut email = use_signal(|| None::<String>);
+    let mut username = use_signal(String::new);
     let mut old_password = use_signal(String::new);
     let mut new_password = use_signal(String::new);
     let mut confirm_password = use_signal(String::new);
     let mut error_msg = use_signal(|| None::<String>);
     let mut success_msg = use_signal(|| None::<String>);
 
-    // 获取用户信息
+    // 获取用户信息 — 直接调用 /api/user/info 即可获取完整信息
     use_effect(move || {
         spawn(async move {
-            // 先获取用户信息接口拿到 username，再通过 list 查找
             if let Ok(info) = api::auth::get_user_info().await {
-                // 通过 username 查询用户详情
-                if let Ok(resp) = api::user::list(Some(1), Some(1), Some(&info.username)).await {
-                    if let Some(u) = resp.list.into_iter().next() {
-                        user.set(u);
-                    }
-                }
+                username.set(info.username);
+                nick_name.set(info.nick_name);
+                phone.set(info.phone);
+                email.set(info.email);
             }
         });
     });
@@ -70,8 +59,6 @@ pub fn Profile() -> Element {
         });
     };
 
-    let u = user();
-
     rsx! {
         div {
             style: "padding: 20px;",
@@ -97,28 +84,28 @@ pub fn Profile() -> Element {
                     div {
                         style: "display: flex; align-items: center; gap: 16px;",
                         label { style: "width: 100px; color: var(--el-text-color-regular); font-size: 14px;", "{t(TKey::Username)}:" }
-                        span { style: "color: var(--el-text-color-primary); font-size: 14px;", "{u.username.clone().unwrap_or_default()}" }
+                        span { style: "color: var(--el-text-color-primary); font-size: 14px;", "{username()}" }
                     }
 
                     // 昵称
                     div {
                         style: "display: flex; align-items: center; gap: 16px;",
                         label { style: "width: 100px; color: var(--el-text-color-regular); font-size: 14px;", "{t(TKey::Nickname)}:" }
-                        span { style: "color: var(--el-text-color-primary); font-size: 14px;", "{u.nick_name.clone().unwrap_or_default()}" }
+                        span { style: "color: var(--el-text-color-primary); font-size: 14px;", "{nick_name().unwrap_or_default()}" }
                     }
 
                     // 手机号
                     div {
                         style: "display: flex; align-items: center; gap: 16px;",
                         label { style: "width: 100px; color: var(--el-text-color-regular); font-size: 14px;", "{t(TKey::Phone)}:" }
-                        span { style: "color: var(--el-text-color-primary); font-size: 14px;", "{u.phone.clone().unwrap_or_default()}" }
+                        span { style: "color: var(--el-text-color-primary); font-size: 14px;", "{phone().unwrap_or_default()}" }
                     }
 
                     // 邮箱
                     div {
                         style: "display: flex; align-items: center; gap: 16px;",
                         label { style: "width: 100px; color: var(--el-text-color-regular); font-size: 14px;", "{t(TKey::Email)}:" }
-                        span { style: "color: var(--el-text-color-primary); font-size: 14px;", "{u.email.clone().unwrap_or_default()}" }
+                        span { style: "color: var(--el-text-color-primary); font-size: 14px;", "{email().unwrap_or_default()}" }
                     }
 
                     // 头像
@@ -127,7 +114,7 @@ pub fn Profile() -> Element {
                         label { style: "width: 100px; color: var(--el-text-color-regular); font-size: 14px;", "{t(TKey::Avatar)}:" }
                         div {
                             style: "width: 64px; height: 64px; border-radius: 50%; background: var(--el-color-primary); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;",
-                            "{u.username.clone().unwrap_or_else(|| 'U'.to_string()).chars().next().unwrap_or('U')}"
+                            "{username().chars().next().unwrap_or('U')}"
                         }
                     }
                 }

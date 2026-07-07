@@ -18,5 +18,13 @@ pub struct LoginResp {
 pub struct UserInfoResp {
     pub username: String,
     #[serde(default)]
+    pub nick_name: Option<String>,
+    #[serde(default)]
+    pub phone: Option<String>,
+    #[serde(default)]
+    pub email: Option<String>,
+    #[serde(default)]
+    pub header_img: Option<String>,
+    #[serde(default)]
     pub menus: Vec<SysMenu>,
 }

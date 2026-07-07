@@ -1,11 +1,13 @@
 //! 主题管理模块 — 亮色/暗色主题切换
 //!
-//! 架构与 i18n 模块一致:
-//! - `GLOBAL_THEME` — 非响应式全局存储 (供非渲染期读取)
-//! - `Signal<ThemeMode>` — 响应式 Signal (供渲染期订阅)
-//! - `provide_theme()` — 在 App 根组件调用，创建 Signal context
+//! 架构:
+//! - `GLOBAL_THEME` — 非响应式全局存储 (供 main() 初始化时读写，在虚拟 DOM 创建前使用)
+//! - `THEME` — `GlobalSignal<ThemeMode>` 响应式全局信号 (渲染期订阅，事件处理器中写入)
 //! - `current_theme()` — 渲染期调用，返回当前主题 (响应式)
 //! - `set_theme()` — 切换主题并持久化到 localStorage
+//!
+//! 使用 `GlobalSignal` 替代 `use_context` + `use_context_provider`，
+//! 避免在事件处理器中调用 hook 导致的 hooks 顺序错乱问题。
 
 use std::sync::{LazyLock, RwLock};
 
@@ -65,29 +67,20 @@ pub fn init_theme() {
     }
 }
 
-/// 在 App 根组件中调用 — 提供响应式 ThemeMode Signal
-pub fn provide_theme() {
-    let initial = *GLOBAL_THEME.read().unwrap();
-    let signal = use_signal(move || initial);
-    use_context_provider(|| signal);
-}
-
-/// 获取当前响应式 ThemeMode Signal (组件渲染期可用)
-pub fn theme_signal() -> Signal<ThemeMode> {
-    use_context::<Signal<ThemeMode>>()
-}
+/// 响应式全局 Signal — 可在任何组件渲染期或事件处理器中使用，无需 use_context
+/// 首次访问时从 GLOBAL_THEME 读取初始值
+static THEME: GlobalSignal<ThemeMode> = Signal::global(|| *GLOBAL_THEME.read().unwrap());
 
 /// 获取当前主题 (响应式 — 渲染期调用会订阅 Signal)
 pub fn current_theme() -> ThemeMode {
-    let sig = theme_signal();
-    sig()
+    THEME()
 }
 
 /// 切换主题并持久化
 pub fn set_theme(mode: ThemeMode) {
     *GLOBAL_THEME.write().unwrap() = mode;
     crate::storage::set(THEME_KEY, mode.as_str());
-    theme_signal().set(mode);
+    *THEME.write() = mode;
 }
 
 /// 在亮色/暗色之间切换
@@ -246,8 +239,8 @@ pub fn theme_css() -> String {
     --el-overlay-color: rgba(0,0,0,0.7);
 }
 
-/* 全局过渡 — 主题切换时平滑 */
-*, *::before, *::after {
+/* 主题切换过渡 — 仅作用于布局元素，避免影响交互组件性能 */
+body, .sidebar-menu-item, .login-container > div, [data-theme] > div {
     transition: background-color var(--el-transition-duration),
                 border-color var(--el-transition-duration),
                 color var(--el-transition-duration);

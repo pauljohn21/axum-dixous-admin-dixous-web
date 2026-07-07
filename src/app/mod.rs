@@ -1,9 +1,8 @@
 use dioxus::prelude::*;
 use dioxus_element_plug::prelude::*;
 
-use crate::i18n::provide_locale;
 use crate::router::{route_config, Route};
-use crate::theme::{current_theme, provide_theme, theme_css};
+use crate::theme::{current_theme, theme_css};
 
 const FAVICON: Asset = asset!("/assets/favicon.ico");
 
@@ -12,8 +11,6 @@ const FAVICON: Asset = asset!("/assets/favicon.ico");
 pub fn App() -> Element {
     let styles = CompleteStyleManager::new().generate_complete_styles();
     let theme_styles = theme_css();
-    provide_locale();
-    provide_theme();
 
     let theme = current_theme();
 

@@ -4,7 +4,7 @@
 //! 本模块仅保留业务翻译表 (TKey + t_zh / t_en) 和 localStorage 注入。
 
 // 从 crate 重新导出通用 API（调用方无需改 import）
-pub use dioxus_i18n::{current_locale, provide_locale, Locale};
+pub use dioxus_i18n::{current_locale, Locale};
 
 /// localStorage key
 const LOCALE_KEY: &str = "admin_locale";

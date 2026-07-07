@@ -3,11 +3,14 @@
 //! 提供 Locale 枚举、全局状态管理和 Dioxus Signal 响应式支持。
 //! localStorage 持久化通过闭包注入，不耦合具体存储实现。
 //!
+//! 使用 `GlobalSignal` 替代 `use_context` + `use_context_provider`，
+//! 避免在事件处理器中调用 hook 导致的 hooks 顺序错乱问题。
+//!
 //! # 快速使用
 //!
 //! ```rust,ignore
 //! use dioxus::prelude::*;
-//! use dioxus_i18n::{Locale, init_locale, provide_locale, set_locale, current_locale};
+//! use dioxus_i18n::{Locale, init_locale, set_locale, current_locale};
 //!
 //! fn main() {
 //!     // 注入存储读取闭包
@@ -17,7 +20,6 @@
 //!
 //! #[component]
 //! fn App() -> Element {
-//!     provide_locale();  // 在根组件中提供 Signal
 //!     rsx! { p { "{current_locale().label()}" } }
 //! }
 //!
@@ -57,9 +59,13 @@ impl Locale {
     }
 }
 
-/// 非响应式全局存储（供 `t()` 读取，避免渲染期必须运行在组件上下文中）
+/// 非响应式全局存储（供 `init_locale()` 读写，在虚拟 DOM 创建前使用）
 static GLOBAL_LOCALE: LazyLock<RwLock<Locale>> =
     LazyLock::new(|| RwLock::new(Locale::ZhCN));
+
+/// 响应式全局 Signal — 可在任何组件渲染期或事件处理器中使用，无需 use_context
+/// 首次访问时从 GLOBAL_LOCALE 读取初始值
+static LOCALE: GlobalSignal<Locale> = Signal::global(|| *GLOBAL_LOCALE.read().unwrap());
 
 /// 初始化语言
 ///
@@ -75,24 +81,9 @@ pub fn init_locale<F: FnOnce() -> Option<String>>(get_stored: F) {
     }
 }
 
-/// 在 App 根组件中调用 — 提供响应式 Locale Signal
-///
-/// 必须在 Dioxus 组件渲染上下文中调用。
-pub fn provide_locale() {
-    let initial = *GLOBAL_LOCALE.read().unwrap();
-    let signal = use_signal(move || initial);
-    use_context_provider(|| signal);
-}
-
-/// 获取当前响应式 Locale Signal（组件渲染期可用）
-pub fn locale_signal() -> Signal<Locale> {
-    use_context::<Signal<Locale>>()
-}
-
 /// 获取当前语言（响应式 — 渲染期调用会订阅 Signal）
 pub fn current_locale() -> Locale {
-    let sig = locale_signal();
-    sig()
+    LOCALE()
 }
 
 /// 切换语言并持久化
@@ -105,7 +96,7 @@ pub fn current_locale() -> Locale {
 pub fn set_locale<F: FnOnce(&str)>(locale: Locale, persist: F) {
     *GLOBAL_LOCALE.write().unwrap() = locale;
     persist(locale.as_str());
-    locale_signal().set(locale);
+    *LOCALE.write() = locale;
 }
 
 impl std::str::FromStr for Locale {

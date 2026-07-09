@@ -7,6 +7,8 @@ use crate::components::admin_layout::AdminLayout;
 use crate::components::api_manage::ApiManage;
 use crate::components::dashboard::Dashboard;
 use crate::components::dict_manage::DictManage;
+use crate::components::generator_manage::GeneratorManage;
+use crate::components::generator_history::GeneratorHistoryPage;
 use crate::components::login::Login;
 use crate::components::menu_manage::MenuManage;
 use crate::components::profile::Profile;
@@ -36,6 +38,10 @@ pub enum Route {
         ApiManage {},
         #[route("/dictionaries")]
         DictManage {},
+        #[route("/generator")]
+        GeneratorManage {},
+        #[route("/generator/history")]
+        GeneratorHistoryPage {},
         #[route("/profile")]
         Profile {},
         #[route("/settings")]

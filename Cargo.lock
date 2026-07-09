@@ -5736,11 +5736,14 @@ dependencies = [
  "dioxus-i18n",
  "element-icons",
  "gloo-net 0.7.0",
+ "js-sys",
  "route-guard",
  "serde",
  "serde_json",
  "slider-captcha",
  "urlencoding",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
  "web-sys",
 ]
 

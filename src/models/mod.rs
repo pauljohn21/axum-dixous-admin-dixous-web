@@ -5,3 +5,5 @@ pub mod user;
 pub mod role;
 pub mod sys_api;
 pub mod dictionary;
+pub mod generator;
+pub mod generator_history;

@@ -10,3 +10,5 @@ pub mod dict_manage;
 pub mod user_dropdown;
 pub mod profile;
 pub mod settings;
+pub mod generator_manage;
+pub mod generator_history;

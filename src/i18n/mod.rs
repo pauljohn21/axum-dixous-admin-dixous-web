@@ -57,6 +57,11 @@ pub enum TKey {
     ThemeMode, LightMode, DarkMode, ThemeColor, PrimaryColor, SuccessColor, WarningColor, DangerColor,
     // 滑块验证
     SliderVerify, SliderVerified, SliderVerifyFirst,
+    // 代码生成器
+    Generator, GeneratorConfig, GeneratorFields, AddField, EditField, PreviewConfig,
+    SaveConfig, ClearForm, TableName, ResourceName, ModuleCn, IconName, GenBackend, GenFrontend, BatchDelete,
+    FieldName, FieldType, FieldComment, SearchType, DefaultValue, Nullable, Required, FormDisplay, TableDisplay,
+    DescDisplay, Sortable, PrimaryKey, EnumValues, UseSimplifiedSearch, UsageGuide,
 }
 
 /// 翻译函数（响应式 — 渲染期调用会订阅 locale Signal）
@@ -128,6 +133,17 @@ fn t_zh(key: TKey) -> String {
         TKey::ThemeColor => "主题色", TKey::PrimaryColor => "主色", TKey::SuccessColor => "成功色",
         TKey::WarningColor => "警告色", TKey::DangerColor => "危险色",
         TKey::SliderVerify => "请拖动滑块验证", TKey::SliderVerified => "验证通过", TKey::SliderVerifyFirst => "请先完成滑块验证",
+        // 代码生成器
+        TKey::Generator => "代码生成器", TKey::GeneratorConfig => "模块配置", TKey::GeneratorFields => "字段列表",
+        TKey::AddField => "+ 新增字段", TKey::EditField => "编辑字段", TKey::PreviewConfig => "预览配置",
+        TKey::SaveConfig => "保存配置", TKey::ClearForm => "清空表单", TKey::TableName => "表名", TKey::ResourceName => "资源名",
+        TKey::ModuleCn => "中文名", TKey::IconName => "图标", TKey::GenBackend => "生成后端",
+        TKey::GenFrontend => "生成前端", TKey::BatchDelete => "批量删除",
+        TKey::FieldName => "字段名", TKey::FieldType => "类型", TKey::FieldComment => "注释",
+        TKey::SearchType => "搜索类型", TKey::DefaultValue => "默认值", TKey::Nullable => "可空",
+        TKey::Required => "必填", TKey::FormDisplay => "表单显示", TKey::TableDisplay => "表格显示",
+        TKey::DescDisplay => "详情显示", TKey::Sortable => "可排序", TKey::PrimaryKey => "主键",
+        TKey::EnumValues => "枚举值", TKey::UseSimplifiedSearch => "或使用简化搜索", TKey::UsageGuide => "使用说明",
     }.into()
 }
 
@@ -184,5 +200,16 @@ fn t_en(key: TKey) -> String {
         TKey::ThemeColor => "Theme Color", TKey::PrimaryColor => "Primary", TKey::SuccessColor => "Success",
         TKey::WarningColor => "Warning", TKey::DangerColor => "Danger",
         TKey::SliderVerify => "Drag slider to verify", TKey::SliderVerified => "Verified", TKey::SliderVerifyFirst => "Please complete slider verification first",
+        // 代码生成器
+        TKey::Generator => "Code Generator", TKey::GeneratorConfig => "Module Config", TKey::GeneratorFields => "Fields",
+        TKey::AddField => "+ Add Field", TKey::EditField => "Edit Field", TKey::PreviewConfig => "Preview Config",
+        TKey::SaveConfig => "Save Config", TKey::ClearForm => "Clear Form", TKey::TableName => "Table Name", TKey::ResourceName => "Resource",
+        TKey::ModuleCn => "Module Name", TKey::IconName => "Icon", TKey::GenBackend => "Gen Backend",
+        TKey::GenFrontend => "Gen Frontend", TKey::BatchDelete => "Batch Delete",
+        TKey::FieldName => "Field Name", TKey::FieldType => "Type", TKey::FieldComment => "Comment",
+        TKey::SearchType => "Search Type", TKey::DefaultValue => "Default Value", TKey::Nullable => "Nullable",
+        TKey::Required => "Required", TKey::FormDisplay => "Form", TKey::TableDisplay => "Table",
+        TKey::DescDisplay => "Detail", TKey::Sortable => "Sortable", TKey::PrimaryKey => "Primary Key",
+        TKey::EnumValues => "Enum Values", TKey::UseSimplifiedSearch => "or simplified search", TKey::UsageGuide => "Usage Guide",
     }.into()
 }

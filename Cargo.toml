@@ -9,9 +9,9 @@ rust-version = "1.96"
 
 [dependencies]
 dioxus = { version = "0.7.1", features = ["router"] }
-dioxus-element-plug = "0.2.2"
+dioxus-element-plug = { version = "0.3", features = ["web"] }
+element-icons = "0.1"
 route-guard = { path = "crates/route-guard" }
-element-icons = { path = "crates/element-icons" }
 dioxus-i18n = { path = "crates/dioxus-i18n" }
 slider-captcha = { path = "crates/slider-captcha" }
 serde = { version = "1", features = ["derive"] }
@@ -25,12 +25,12 @@ js-sys = "0.3"
 
 [features]
 default = ["web"]
-web = ["dioxus/web"]
+web = ["dioxus/web", "dioxus-element-plug/web"]
 desktop = ["dioxus/desktop"]
 mobile = ["dioxus/mobile"]
 
 [workspace]
-members = ["crates/route-guard", "crates/element-icons", "crates/dioxus-i18n", "crates/slider-captcha"]
+members = ["crates/route-guard", "crates/dioxus-i18n", "crates/slider-captcha"]
 
 # 最小化 WASM 体积的 release profile
 [profile.release]
